@@ -1,101 +1,110 @@
-import Image from "next/image";
+import React from 'react';
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Trophy, Users, Zap, Timer } from 'lucide-react';
+import Link from 'next/link'; // Add this import at the top
 
-export default function Home() {
+// Sample data - in real app, this would come from your API/database
+const featuredCompetitions = [
+  {
+    id: 1,
+    title: "Neural Network Challenge 2024",
+    prize: "50,000 USDC",
+    participants: 1234,
+    deadline: "5 days left",
+    difficulty: "Advanced",
+    tags: ["AI", "Deep Learning"]
+  },
+  {
+    id: 2,
+    title: "Quantum Computing Optimization",
+    prize: "25,000 USDC",
+    participants: 856,
+    deadline: "12 days left",
+    difficulty: "Expert",
+    tags: ["Quantum", "Optimization"]
+  },
+  {
+    id: 3,
+    title: "Blockchain Data Analysis",
+    prize: "30,000 USDC",
+    participants: 567,
+    deadline: "8 days left",
+    difficulty: "Intermediate",
+    tags: ["Blockchain", "Analytics"]
+  }
+];
+
+const HomePage = () => {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen bg-black text-white">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/50 to-cyan-900/50" />
+        <div className="relative px-6 py-24 mx-auto max-w-7xl">
+          <div className="text-center">
+            <h1 className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400 mb-6">
+              Decode the Future
+            </h1>
+            <p className="text-xl text-gray-300 mb-8">
+              Compete. Create. Conquer. Welcome to the next generation of data science competitions.
+            </p>
+            <div className="flex justify-center gap-4">
+              <Link href="/competitions">
+                <Badge className="px-4 py-2 text-lg bg-purple-600 hover:bg-purple-700">
+                  Browse Competitions
+                </Badge>
+              </Link>
+              <Badge className="px-4 py-2 text-lg bg-cyan-600 hover:bg-cyan-700">
+                Learn More
+              </Badge>
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
+
+      {/* Featured Competitions */}
+      <div className="px-6 py-16 mx-auto max-w-7xl">
+        <h2 className="text-3xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
+          Featured Competitions
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {featuredCompetitions.map((competition) => (
+            <Card key={competition.id} className="bg-gray-900 border-gray-800 hover:border-purple-500 transition-all duration-300">
+              <CardContent className="p-6">
+                <h3 className="text-xl font-bold mb-4 text-white">{competition.title}</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Trophy className="w-5 h-5 text-yellow-500" />
+                    <span className="text-yellow-500">{competition.prize}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Users className="w-5 h-5 text-blue-400" />
+                    <span className="text-gray-400">{competition.participants} participants</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Timer className="w-5 h-5 text-red-400" />
+                    <span className="text-gray-400">{competition.deadline}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Zap className="w-5 h-5 text-green-400" />
+                    <span className="text-gray-400">{competition.difficulty}</span>
+                  </div>
+                  <div className="flex gap-2 mt-4">
+                    {competition.tags.map((tag) => (
+                      <Badge key={tag} variant="secondary" className="bg-gray-800 text-gray-300">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
     </div>
   );
-}
+};
+
+export default HomePage;
