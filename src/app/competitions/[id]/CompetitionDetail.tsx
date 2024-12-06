@@ -4,36 +4,32 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trophy, Users, Timer, Zap, ChartBar, FileText, MessageSquare } from 'lucide-react';
+import { Play, Trophy, Users, Timer, Zap, ChartBar, FileText, MessageSquare } from 'lucide-react';
 import LeaderboardComponent from './LeaderboardComponent';
 
 // Sample competition data
 const competitionData = {
   id: 1,
-  title: "Neural Network Challenge 2024",
-  description: "Build a neural network that can predict quantum states with unprecedented accuracy. This competition challenges participants to develop innovative approaches to quantum state prediction using advanced neural network architectures.",
-  prize: "50,000 USDC",
-  participants: 1234,
-  deadline: "5 days left",
+  title: "Loss Search",
+  description: "Produce a loss that can more efficiently train on simple datasets.",
+  prize: "Subnet Emissions",
+  participants: 255,
+  start_date: "1/12/2024",
+  deadline: "TBA",
   difficulty: "Advanced",
   status: "Active",
   tags: ["AI", "Deep Learning", "Quantum Computing"],
   rules: [
-    "Submissions must be made before the deadline",
-    "Maximum of 5 submissions per day",
-    "Final solutions must include documentation",
-    "Code must be original and properly licensed",
+    "No Cheating !",
+    "All submissions are to be done on chain",
   ],
   timeline: [
-    { date: "Jan 1, 2024", event: "Competition Start" },
-    { date: "Feb 1, 2024", event: "First Benchmark Release" },
-    { date: "Mar 1, 2024", event: "Final Submission Deadline" },
-    { date: "Mar 15, 2024", event: "Winners Announced" },
+    { date: "Dec 1, 2024", event: "Competition Start" },
   ],
   leaderboard: [
-    { rank: 1, team: "QuantumMinds", score: 0.9856, submissions: 12 },
-    { rank: 2, team: "DeepQuantum", score: 0.9845, submissions: 15 },
-    { rank: 3, team: "NeuralNet Pro", score: 0.9832, submissions: 8 },
+    // { rank: 1, team: "QuantumMinds", score: 0.9856, submissions: 12 },
+    // { rank: 2, team: "DeepQuantum", score: 0.9845, submissions: 15 },
+    // { rank: 3, team: "NeuralNet Pro", score: 0.9832, submissions: 8 },
   ]
 };
 
@@ -75,6 +71,15 @@ const CompetitionDetail = () => {
               <div>
                 <p className="text-sm text-gray-400">Participants</p>
                 <p className="text-lg font-bold text-blue-400">{competitionData.participants}</p>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-gray-900 border-gray-800">
+            <CardContent className="p-4 flex items-center gap-3">
+              <Play className="w-6 h-6 text-red-400" />
+              <div>
+                <p className="text-sm text-gray-400">Start Date</p>
+                <p className="text-lg font-bold text-red-400">{competitionData.start_date}</p>
               </div>
             </CardContent>
           </Card>

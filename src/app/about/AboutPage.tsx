@@ -8,34 +8,35 @@ import { Brain, Database, Lock, Cpu, Github, Twitter, Linkedin } from 'lucide-re
 const AboutPage = () => {
   const teamMembers = [
     {
-      name: "Dr. Alice Chen",
-      role: "Chief AI Researcher",
-      bio: "Former DeepMind researcher, specializing in evolutionary algorithms and neural architecture search.",
+      name: "Dr. Kofi Osei-Obonsu",
+      role: "ASI Prophet",
+      bio: ".",
       image: "/api/placeholder/150/150",
       links: {
-        github: "https://github.com",
-        twitter: "https://twitter.com",
-        linkedin: "https://linkedin.com"
+        // github: "https://github.com",
+        // twitter: "https://twitter.com",
+        // linkedin: "https://linkedin.com"
       }
     },
     {
-      name: "Bob Smith",
-      role: "Blockchain Architect",
-      bio: "Core contributor to Polkadot, focused on decentralized competition platforms and zero-knowledge proofs.",
+      name: "Ali Hussein",
+      role: "ASI Summoner",
+      bio: ".",
       image: "/api/placeholder/150/150",
       links: {
-        github: "https://github.com",
-        linkedin: "https://linkedin.com"
+        github: "https://github.com/mekaneeky",
+        twitter: "https://twitter.com/GPLv6",
+        linkedin: "https://linkedin.com/ali-hussein-ai"
       }
     },
     {
-      name: "Carol Wu",
-      role: "Platform Engineer",
-      bio: "Full-stack developer with expertise in distributed systems and high-performance computing.",
+      name: "SECRET SECRET",
+      role: "SECRET NEOPHYTE AWAITING INITIATION",
+      bio: ".",
       image: "/api/placeholder/150/150",
       links: {
-        github: "https://github.com",
-        twitter: "https://twitter.com"
+        //github: "https://github.com/",
+        //linkedin: "https://linkedin.com/"
       }
     }
   ];

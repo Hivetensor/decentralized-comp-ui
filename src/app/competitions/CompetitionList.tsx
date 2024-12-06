@@ -5,7 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Trophy, Users, Timer, Zap, Search, SlidersHorizontal } from 'lucide-react';
+import { Play, Trophy, Users, Timer, Zap, Search, SlidersHorizontal } from 'lucide-react';
+import Link from 'next/link'; // Add this import at the top
 
 // Types
 type Difficulty = 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
@@ -17,6 +18,7 @@ interface Competition {
   description: string;
   prize: string;
   participants: number;
+  start_date: string;
   deadline: string;
   difficulty: Difficulty;
   status: Status;
@@ -27,38 +29,29 @@ interface Competition {
 const competitions: Competition[] = [
   {
     id: 1,
-    title: "Neural Network Challenge 2024",
-    description: "Build a neural network that can predict quantum states with unprecedented accuracy.",
-    prize: "50,000 USDC",
-    participants: 1234,
-    deadline: "5 days left",
+    title: "Loss Search",
+    description: "Produce a loss that can more efficiently train on simple datasets.",
+    prize: "Subnet Emissions",
+    participants: 255,
+    start_date: "1/12/2024",
+    deadline: "Soon!",
     difficulty: "Advanced",
     status: "Active",
     tags: ["AI", "Deep Learning"]
   },
   {
     id: 2,
-    title: "Quantum Computing Optimization",
-    description: "Optimize quantum circuits for maximum efficiency and minimal decoherence.",
-    prize: "25,000 USDC",
-    participants: 856,
-    deadline: "12 days left",
-    difficulty: "Expert",
+    title: "Activation, Loss and Optimizer Search",
+    description: "Produce an activation, loss, or optimizer that can more efficiently train on simple datasets.",
+    prize: "Subnet Emissions",
+    participants: 255,
+    start_date: "TBA",
+    deadline: "TBA",
+    difficulty: "Advanced",
     status: "Active",
-    tags: ["Quantum", "Optimization"]
+    tags: ["AI", "Deep Learning"]
   },
-  {
-    id: 3,
-    title: "Blockchain Data Analysis",
-    description: "Analyze cross-chain data to identify patterns in DeFi protocols.",
-    prize: "30,000 USDC",
-    participants: 567,
-    deadline: "8 days left",
-    difficulty: "Intermediate",
-    status: "Active",
-    tags: ["Blockchain", "Analytics"]
-  },
-  // Add more competitions as needed
+  
 ];
 
 const CompetitionList = () => {
@@ -138,7 +131,9 @@ const CompetitionList = () => {
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row justify-between">
                   <div className="flex-1">
-                    <h3 className="text-2xl font-bold mb-2 text-white">{competition.title}</h3>
+                    <Link href={`/competitions/${competition.id}`}>
+                      <h3 className="text-2xl font-bold mb-2 text-white">{competition.title}</h3>
+                    </Link>
                     <p className="text-gray-400 mb-4">{competition.description}</p>
                     <div className="flex flex-wrap gap-2 mb-4">
                       {competition.tags.map((tag) => (
@@ -156,6 +151,10 @@ const CompetitionList = () => {
                     <div className="flex items-center gap-2">
                       <Users className="w-5 h-5 text-blue-400" />
                       <span className="text-gray-400">{competition.participants} participants</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Play className="w-5 h-5 text-yellow-400" />
+                      <span className="text-gray-400">{competition.start_date}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Timer className="w-5 h-5 text-red-400" />
