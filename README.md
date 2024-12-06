@@ -1,5 +1,32 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+Here's the complete setup process after cloning:
+
+1. Install dependencies:
+```bash
+npm install next@latest react@latest react-dom@latest
+npm install @radix-ui/react-slot lucide-react @polkadot/extension-dapp @polkadot/api
+npm install -D tailwindcss@latest postcss autoprefixer
+npx tailwindcss init -p
+```
+
+2. Install shadcn components:
+```bash
+npx shadcn@latest init
+npx shadcn@latest add button
+npx shadcn@latest add card
+npx shadcn@latest add badge
+npx shadcn@latest add input
+npx shadcn@latest add alert
+npx shadcn@latest add tabs
+```
+
+3. Run the development server:
+```bash
+npm run dev
+```
+
+
 ## Getting Started
 
 First, run the development server:
