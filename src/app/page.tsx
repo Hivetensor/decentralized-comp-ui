@@ -62,47 +62,6 @@ const HomePage = () => {
           </div>
         </div>
       </div>
-
-      {/* Featured Competitions */}
-      <div className="px-6 py-16 mx-auto max-w-7xl">
-        <h2 className="text-3xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
-          Featured Competitions
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featuredCompetitions.map((competition) => (
-            <Card key={competition.id} className="bg-gray-900 border-gray-800 hover:border-purple-500 transition-all duration-300">
-              <CardContent className="p-6">
-                <h3 className="text-xl font-bold mb-4 text-white">{competition.title}</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Trophy className="w-5 h-5 text-yellow-500" />
-                    <span className="text-yellow-500">{competition.prize}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Users className="w-5 h-5 text-blue-400" />
-                    <span className="text-gray-400">{competition.participants} participants</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Timer className="w-5 h-5 text-red-400" />
-                    <span className="text-gray-400">{competition.deadline}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Zap className="w-5 h-5 text-green-400" />
-                    <span className="text-gray-400">{competition.difficulty}</span>
-                  </div>
-                  <div className="flex gap-2 mt-4">
-                    {competition.tags.map((tag) => (
-                      <Badge key={tag} variant="secondary" className="bg-gray-800 text-gray-300">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
     </div>
   );
 };

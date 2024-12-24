@@ -1,63 +1,28 @@
-'use client';  // Add this at the top
+'use client';
 
 import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Play, Trophy, Users, Timer, Zap, Search, SlidersHorizontal } from 'lucide-react';
-import Link from 'next/link'; // Add this import at the top
-
-// Types
-type Difficulty = 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
-type Status = 'Active' | 'Upcoming' | 'Completed';
-
-interface Competition {
-  id: number;
-  title: string;
-  description: string;
-  prize: string;
-  participants: number;
-  start_date: string;
-  deadline: string;
-  difficulty: Difficulty;
-  status: Status;
-  tags: string[];
-}
-
-// Sample data
-const competitions: Competition[] = [
-  {
-    id: 1,
-    title: "Loss Search",
-    description: "Produce a loss that can more efficiently train on simple datasets.",
-    prize: "Subnet Emissions",
-    participants: 255,
-    start_date: "1/12/2024",
-    deadline: "Soon!",
-    difficulty: "Advanced",
-    status: "Active",
-    tags: ["AI", "Deep Learning"]
-  },
-  {
-    id: 2,
-    title: "Activation, Loss and Optimizer Search",
-    description: "Produce an activation, loss, or optimizer that can more efficiently train on simple datasets.",
-    prize: "Subnet Emissions",
-    participants: 255,
-    start_date: "TBA",
-    deadline: "TBA",
-    difficulty: "Advanced",
-    status: "Active",
-    tags: ["AI", "Deep Learning"]
-  },
-  
-];
+import { Play, Trophy, Users, Timer, Zap, Search } from 'lucide-react';
+import Link from 'next/link';
+import { useCompetitions } from '@/hooks/useCompetition';
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2 } from 'lucide-react';
 
 const CompetitionList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [difficultyFilter, setDifficultyFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<string>('deadline');
+
+  const { competitions, loading, error } = useCompetitions({
+    search: searchQuery,
+    difficulty: difficultyFilter !== 'all' ? difficultyFilter : undefined,
+    status: statusFilter !== 'all' ? statusFilter : undefined,
+    sortBy,
+  });
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -84,7 +49,7 @@ const CompetitionList = () => {
             />
           </div>
           
-          <Select onValueChange={setDifficultyFilter}>
+          <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
             <SelectTrigger className="bg-gray-900 border-gray-800 text-white">
               <SelectValue placeholder="Difficulty" />
             </SelectTrigger>
@@ -97,7 +62,7 @@ const CompetitionList = () => {
             </SelectContent>
           </Select>
 
-          <Select onValueChange={setStatusFilter}>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="bg-gray-900 border-gray-800 text-white">
               <SelectValue placeholder="Status" />
             </SelectTrigger>
@@ -109,7 +74,7 @@ const CompetitionList = () => {
             </SelectContent>
           </Select>
 
-          <Select>
+          <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="bg-gray-900 border-gray-800 text-white">
               <SelectValue placeholder="Sort By" />
             </SelectTrigger>
@@ -121,55 +86,73 @@ const CompetitionList = () => {
           </Select>
         </div>
 
+        {/* Error State */}
+        {error && (
+          <Alert variant="destructive" className="mb-6 bg-red-900/20 border-red-900">
+            <AlertDescription>
+              Failed to load competitions. Please try again later.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Loading State */}
+        {loading && (
+          <div className="flex justify-center items-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
+          </div>
+        )}
+
         {/* Competition Cards */}
-        <div className="grid grid-cols-1 gap-6">
-          {competitions.map((competition) => (
-            <Card 
-              key={competition.id} 
-              className="bg-gray-900 border-gray-800 hover:border-purple-500 transition-all duration-300"
-            >
-              <CardContent className="p-6">
-                <div className="flex flex-col md:flex-row justify-between">
-                  <div className="flex-1">
-                    <Link href={`/competitions/${competition.id}`}>
-                      <h3 className="text-2xl font-bold mb-2 text-white">{competition.title}</h3>
-                    </Link>
-                    <p className="text-gray-400 mb-4">{competition.description}</p>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {competition.tags.map((tag) => (
-                        <Badge key={tag} variant="secondary" className="bg-gray-800 text-gray-300">
-                          {tag}
-                        </Badge>
-                      ))}
+        {!loading && !error && (
+          <div className="grid grid-cols-1 gap-6">
+            {competitions.map((competition) => (
+              <Card 
+                key={competition.id} 
+                className="bg-gray-900 border-gray-800 hover:border-purple-500 transition-all duration-300"
+              >
+                <CardContent className="p-6">
+                  <div className="flex flex-col md:flex-row justify-between">
+                    <div className="flex-1">
+                      <Link href={`/competitions/${competition.id}`}>
+                        <h3 className="text-2xl font-bold mb-2 text-white">{competition.title}</h3>
+                      </Link>
+                      <p className="text-gray-400 mb-4">{competition.description}</p>
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {competition.tags.map((tag) => (
+                          <Badge key={tag} variant="secondary" className="bg-gray-800 text-gray-300">
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex flex-col justify-between md:ml-8 space-y-4">
+                      <div className="flex items-center gap-2">
+                        <Trophy className="w-5 h-5 text-yellow-500" />
+                        <span className="text-yellow-500 font-bold">{competition.prize}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Users className="w-5 h-5 text-blue-400" />
+                        <span className="text-gray-400">{competition.participants} participants</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Play className="w-5 h-5 text-yellow-400" />
+                        <span className="text-gray-400">{competition.start_date}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Timer className="w-5 h-5 text-red-400" />
+                        <span className="text-gray-400">{competition.deadline}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Zap className="w-5 h-5 text-green-400" />
+                        <span className="text-gray-400">{competition.difficulty}</span>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex flex-col justify-between md:ml-8 space-y-4">
-                    <div className="flex items-center gap-2">
-                      <Trophy className="w-5 h-5 text-yellow-500" />
-                      <span className="text-yellow-500 font-bold">{competition.prize}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Users className="w-5 h-5 text-blue-400" />
-                      <span className="text-gray-400">{competition.participants} participants</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Play className="w-5 h-5 text-yellow-400" />
-                      <span className="text-gray-400">{competition.start_date}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Timer className="w-5 h-5 text-red-400" />
-                      <span className="text-gray-400">{competition.deadline}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Zap className="w-5 h-5 text-green-400" />
-                      <span className="text-gray-400">{competition.difficulty}</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

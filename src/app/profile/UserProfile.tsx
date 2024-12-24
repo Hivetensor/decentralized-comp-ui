@@ -1,67 +1,43 @@
 'use client';
 
 import React from 'react';
+import { useParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, Star, Award, GitBranch, Clock, Users } from 'lucide-react';
-
-// Types
-interface Competition {
-  id: string;
-  name: string;
-  rank: number;
-  score: number;
-  totalParticipants: number;
-  date: string;
-}
-
-interface UserStats {
-  totalCompetitions: number;
-  bestRank: number;
-  totalSubmissions: number;
-  averageScore: number;
-}
-
-// Sample data
-const userData = {
-  username: "generalElephant",
-  publicKey: "0x1234...5678",
-  joinDate: "2024-01-15",
-  stats: {
-    totalCompetitions: 12,
-    bestRank: 1,
-    totalSubmissions: 156,
-    averageScore: 0.92,
-  },
-  recentCompetitions: [
-    {
-      id: "1",
-      name: "Neural Network Challenge 2024",
-      rank: 1,
-      score: 0.945,
-      totalParticipants: 234,
-      date: "2024-12-01"
-    },
-    {
-      id: "2",
-      name: "Quantum Computing Optimization",
-      rank: 3,
-      score: 0.912,
-      totalParticipants: 189,
-      date: "2024-11-15"
-    },
-    {
-      id: "3",
-      name: "Blockchain Data Analysis",
-      rank: 2,
-      score: 0.923,
-      totalParticipants: 167,
-      date: "2024-10-30"
-    }
-  ]
-};
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2 } from 'lucide-react';
+import { useProfile } from '@/hooks/useProfile';
 
 const UserProfile = () => {
+  const params = useParams();
+  const username = String(params.username);
+  const { profile, loading, error } = useProfile(username);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-black text-white p-8">
+        <Alert variant="destructive" className="bg-red-900/20 border-red-900">
+          <AlertDescription>
+            Failed to load user profile. Please try again later.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  if (!profile) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
@@ -69,15 +45,15 @@ const UserProfile = () => {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-6">
             <div className="w-24 h-24 rounded-full bg-gradient-to-r from-purple-500 to-cyan-500 flex items-center justify-center text-3xl font-bold">
-              {userData.username[0].toUpperCase()}
+              {profile.username[0].toUpperCase()}
             </div>
             <div>
               <h1 className="text-4xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
-                {userData.username}
+                {profile.username}
               </h1>
               <div className="flex items-center gap-4 text-gray-300">
-                <code className="bg-gray-800 px-3 py-1 rounded">{userData.publicKey}</code>
-                <span>Member since {new Date(userData.joinDate).toLocaleDateString()}</span>
+                <code className="bg-gray-800 px-3 py-1 rounded">{profile.publicKey}</code>
+                <span>Member since {new Date(profile.joinDate).toLocaleDateString()}</span>
               </div>
             </div>
           </div>
@@ -92,7 +68,7 @@ const UserProfile = () => {
               <Trophy className="w-8 h-8 text-yellow-500" />
               <div>
                 <p className="text-sm text-gray-400">Competitions</p>
-                <p className="text-2xl font-bold text-yellow-500">{userData.stats.totalCompetitions}</p>
+                <p className="text-2xl font-bold text-yellow-500">{profile.stats.totalCompetitions}</p>
               </div>
             </CardContent>
           </Card>
@@ -102,7 +78,7 @@ const UserProfile = () => {
               <Star className="w-8 h-8 text-purple-500" />
               <div>
                 <p className="text-sm text-gray-400">Best Rank</p>
-                <p className="text-2xl font-bold text-purple-500">#{userData.stats.bestRank}</p>
+                <p className="text-2xl font-bold text-purple-500">#{profile.stats.bestRank}</p>
               </div>
             </CardContent>
           </Card>
@@ -112,7 +88,7 @@ const UserProfile = () => {
               <GitBranch className="w-8 h-8 text-cyan-500" />
               <div>
                 <p className="text-sm text-gray-400">Submissions</p>
-                <p className="text-2xl font-bold text-cyan-500">{userData.stats.totalSubmissions}</p>
+                <p className="text-2xl font-bold text-cyan-500">{profile.stats.totalSubmissions}</p>
               </div>
             </CardContent>
           </Card>
@@ -122,7 +98,7 @@ const UserProfile = () => {
               <Award className="w-8 h-8 text-green-500" />
               <div>
                 <p className="text-sm text-gray-400">Avg Score</p>
-                <p className="text-2xl font-bold text-green-500">{userData.stats.averageScore}</p>
+                <p className="text-2xl font-bold text-green-500">{profile.stats.averageScore}</p>
               </div>
             </CardContent>
           </Card>
@@ -137,7 +113,7 @@ const UserProfile = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {userData.recentCompetitions.map((competition) => (
+              {profile.recentCompetitions.map((competition) => (
                 <div 
                   key={competition.id}
                   className="p-4 bg-gray-800/50 rounded-lg border border-gray-700 hover:border-purple-500 transition-all duration-300"

@@ -29,16 +29,7 @@ const AboutPage = () => {
         linkedin: "https://linkedin.com/ali-hussein-ai"
       }
     },
-    {
-      name: "SECRET SECRET",
-      role: "SECRET NEOPHYTE AWAITING INITIATION",
-      bio: ".",
-      image: "/api/placeholder/150/150",
-      links: {
-        //github: "https://github.com/",
-        //linkedin: "https://linkedin.com/"
-      }
-    }
+
   ];
 
   return (

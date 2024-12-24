@@ -1,55 +1,61 @@
 'use client';
 
 import React from 'react';
+import { useParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Play, Trophy, Users, Timer, Zap, ChartBar, FileText, MessageSquare } from 'lucide-react';
+import { Play, Trophy, Users, Timer, Zap } from 'lucide-react';
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2 } from 'lucide-react';
+import { useCompetitionDetail } from '@/hooks/useCompetition';
 import LeaderboardComponent from './LeaderboardComponent';
 
-// Sample competition data
-const competitionData = {
-  id: 1,
-  title: "Loss Search",
-  description: "Produce a loss that can more efficiently train on simple datasets.",
-  prize: "Subnet Emissions",
-  participants: 255,
-  start_date: "1/12/2024",
-  deadline: "TBA",
-  difficulty: "Advanced",
-  status: "Active",
-  tags: ["AI", "Deep Learning", "Quantum Computing"],
-  rules: [
-    "No Cheating !",
-    "All submissions are to be done on chain",
-  ],
-  timeline: [
-    { date: "Dec 1, 2024", event: "Competition Start" },
-  ],
-  leaderboard: [
-    // { rank: 1, team: "QuantumMinds", score: 0.9856, submissions: 12 },
-    // { rank: 2, team: "DeepQuantum", score: 0.9845, submissions: 15 },
-    // { rank: 3, team: "NeuralNet Pro", score: 0.9832, submissions: 8 },
-  ]
-};
-
 const CompetitionDetail = () => {
+  const params = useParams();
+  const competitionId = Number(params.id);
+  const { competition, leaderboard, loading, error } = useCompetitionDetail(competitionId);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-black text-white p-8">
+        <Alert variant="destructive" className="bg-red-900/20 border-red-900">
+          <AlertDescription>
+            Failed to load competition details. Please try again later.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  if (!competition) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
       <div className="bg-gradient-to-r from-purple-900/50 to-cyan-900/50 p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-4 mb-4">
-            {competitionData.tags.map((tag) => (
+            {competition.tags.map((tag) => (
               <Badge key={tag} className="bg-gray-800 text-gray-300">
                 {tag}
               </Badge>
             ))}
           </div>
           <h1 className="text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
-            {competitionData.title}
+            {competition.title}
           </h1>
-          <p className="text-gray-300 max-w-3xl">{competitionData.description}</p>
+          <p className="text-gray-300 max-w-3xl">{competition.description}</p>
         </div>
       </div>
 
@@ -61,7 +67,7 @@ const CompetitionDetail = () => {
               <Trophy className="w-6 h-6 text-yellow-500" />
               <div>
                 <p className="text-sm text-gray-400">Prize Pool</p>
-                <p className="text-lg font-bold text-yellow-500">{competitionData.prize}</p>
+                <p className="text-lg font-bold text-yellow-500">{competition.prize}</p>
               </div>
             </CardContent>
           </Card>
@@ -70,7 +76,7 @@ const CompetitionDetail = () => {
               <Users className="w-6 h-6 text-blue-400" />
               <div>
                 <p className="text-sm text-gray-400">Participants</p>
-                <p className="text-lg font-bold text-blue-400">{competitionData.participants}</p>
+                <p className="text-lg font-bold text-blue-400">{competition.participants}</p>
               </div>
             </CardContent>
           </Card>
@@ -79,7 +85,7 @@ const CompetitionDetail = () => {
               <Play className="w-6 h-6 text-red-400" />
               <div>
                 <p className="text-sm text-gray-400">Start Date</p>
-                <p className="text-lg font-bold text-red-400">{competitionData.start_date}</p>
+                <p className="text-lg font-bold text-red-400">{competition.start_date}</p>
               </div>
             </CardContent>
           </Card>
@@ -88,16 +94,7 @@ const CompetitionDetail = () => {
               <Timer className="w-6 h-6 text-red-400" />
               <div>
                 <p className="text-sm text-gray-400">Time Remaining</p>
-                <p className="text-lg font-bold text-red-400">{competitionData.deadline}</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="bg-gray-900 border-gray-800">
-            <CardContent className="p-4 flex items-center gap-3">
-              <Zap className="w-6 h-6 text-green-400" />
-              <div>
-                <p className="text-sm text-gray-400">Difficulty</p>
-                <p className="text-lg font-bold text-green-400">{competitionData.difficulty}</p>
+                <p className="text-lg font-bold text-red-400">{competition.deadline}</p>
               </div>
             </CardContent>
           </Card>
@@ -118,8 +115,7 @@ const CompetitionDetail = () => {
                 <CardTitle>Competition Overview</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-300">{competitionData.description}</p>
-                {/* Add more overview content here */}
+                <p className="text-gray-300">{competition.description}</p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -131,7 +127,7 @@ const CompetitionDetail = () => {
               </CardHeader>
               <CardContent>
                 <ul className="space-y-4">
-                  {competitionData.rules.map((rule, index) => (
+                  {competition.rules.map((rule, index) => (
                     <li key={index} className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-purple-500 rounded-full" />
                       <span className="text-gray-300">{rule}</span>
@@ -149,7 +145,7 @@ const CompetitionDetail = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  {competitionData.timeline.map((event, index) => (
+                  {competition.timeline.map((event, index) => (
                     <div key={index} className="flex items-center gap-4">
                       <div className="w-2 h-2 bg-cyan-500 rounded-full" />
                       <div className="flex-1">
@@ -164,7 +160,7 @@ const CompetitionDetail = () => {
           </TabsContent>
 
           <TabsContent value="leaderboard" className="mt-6">
-            <LeaderboardComponent />
+            <LeaderboardComponent leaderboardData={leaderboard} />
           </TabsContent>
         </Tabs>
       </div>
