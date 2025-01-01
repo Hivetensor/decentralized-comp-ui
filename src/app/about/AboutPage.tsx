@@ -4,6 +4,7 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Brain, Database, Lock, Cpu, Github, Twitter, Linkedin } from 'lucide-react';
+import Image from 'next/image'
 
 const AboutPage = () => {
   const teamMembers = [
@@ -41,7 +42,7 @@ const AboutPage = () => {
             Revolutionizing AI Research
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            We're building the first decentralized platform for AI research competitions, 
+            We&apos;re building the first decentralized platform for AI research competitions, 
             powered by blockchain technology and cutting-edge infrastructure.
           </p>
         </div>
@@ -100,7 +101,7 @@ const AboutPage = () => {
             {teamMembers.map((member, index) => (
               <Card key={index} className="bg-gray-900 border-gray-800">
                 <CardContent className="p-6 text-center">
-                  <img
+                  <Image
                     src={member.image}
                     alt={member.name}
                     className="w-32 h-32 rounded-full mx-auto mb-4 bg-gray-800"
