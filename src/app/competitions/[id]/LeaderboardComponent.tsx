@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import _ from 'lodash';
+import {maxBy, range, uniq} from 'lodash';
 
 const LeaderboardComponent = ({ leaderboardData }) => {
   const colors = [
@@ -27,7 +27,7 @@ const LeaderboardComponent = ({ leaderboardData }) => {
     if (numIterations === 0) return [];
     
     // Create data points for each iteration
-    const iterations = _.range(numIterations).map(iteration => {
+    const iterations = range(numIterations).map(iteration => {
       const point = { iteration: `Iteration ${iteration}` };
       
       leaderboardData.forEach(entry => {
@@ -46,10 +46,10 @@ const LeaderboardComponent = ({ leaderboardData }) => {
 
   // Get final scores for leaderboard table
   const finalScores = useMemo(() => {
-    const teams = _.uniq(leaderboardData.map(entry => entry.team_name));
+    const teams = uniq(leaderboardData.map(entry => entry.team_name));
     return teams.map(team => {
       const entries = leaderboardData.filter(entry => entry.team_name === team);
-      const latestEntry = _.maxBy(entries, 'submission_date');
+      const latestEntry = maxBy(entries, 'submission_date');
       return {
         team_name: team,
         score: latestEntry.score,
