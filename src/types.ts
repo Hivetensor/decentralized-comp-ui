@@ -10,18 +10,14 @@ export interface Competition {
     status: 'Active' | 'Upcoming' | 'Completed';
     tags: string[];
     rules: string[];
-    timeline: Array<{
-      date: string;
-      event: string;
-    }>;
   }
   
   export interface LeaderboardEntry {
     rank: number;
-    team: string;
+    team_name: string;
     score: number;
-    submissions: number;
-    performance: number[];
+    scores: number[];
+    submission_date: number;
   }
   
   export interface UserProfile {

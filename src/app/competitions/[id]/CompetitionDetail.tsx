@@ -105,7 +105,7 @@ const CompetitionDetail = () => {
           <TabsList className="bg-gray-900 border-gray-800">
             <TabsTrigger value="overview" className="data-[state=active]:bg-purple-600">Overview</TabsTrigger>
             <TabsTrigger value="rules" className="data-[state=active]:bg-purple-600">Rules</TabsTrigger>
-            <TabsTrigger value="timeline" className="data-[state=active]:bg-purple-600">Timeline</TabsTrigger>
+            {/* <TabsTrigger value="timeline" className="data-[state=active]:bg-purple-600">Timeline</TabsTrigger> */}
             <TabsTrigger value="leaderboard" className="data-[state=active]:bg-purple-600">Leaderboard</TabsTrigger>
           </TabsList>
 
@@ -138,7 +138,7 @@ const CompetitionDetail = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="timeline" className="mt-6">
+          {/* <TabsContent value="timeline" className="mt-6">
             <Card className="bg-gray-900 border-gray-800">
               <CardHeader>
                 <CardTitle>Competition Timeline</CardTitle>
@@ -157,7 +157,7 @@ const CompetitionDetail = () => {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          </TabsContent> */}
 
           <TabsContent value="leaderboard" className="mt-6">
             <LeaderboardComponent leaderboardData={leaderboard} />
@@ -169,3 +169,4 @@ const CompetitionDetail = () => {
 };
 
 export default CompetitionDetail;
+

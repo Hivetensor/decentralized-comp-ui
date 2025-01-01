@@ -1,32 +1,75 @@
-'use client';
-
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { LeaderboardEntry } from '@/types';
+import _ from 'lodash';
 
-interface LeaderboardComponentProps {
-  leaderboardData: LeaderboardEntry[];
-}
-
-const LeaderboardComponent: React.FC<LeaderboardComponentProps> = ({ leaderboardData }) => {
+const LeaderboardComponent = ({ leaderboardData }) => {
   const colors = [
     '#ff0099', '#00ff99', '#9900ff', '#ff9900', '#00ffff',
     '#ff00ff', '#99ff00', '#0099ff', '#ffff00', '#ff0000'
   ];
 
-  const chartData = leaderboardData[0]?.performance.map((_, index) => {
-    const point: any = { iteration: `Iteration ${index + 1}` };
-    leaderboardData.forEach(entry => {
-      point[entry.team] = entry.performance[index];
+  // Transform data into iterations format
+  const timeSeriesData = useMemo(() => {
+    if (!leaderboardData?.length) return [];
+    
+    console.log("First entry complete:", JSON.stringify(leaderboardData[0], null, 2));
+    console.log("Type of scores:", typeof leaderboardData[0].scores);
+    console.log("Is scores array?", Array.isArray(leaderboardData[0].scores));
+    console.log("Scores value:", leaderboardData[0].scores);
+        
+    // Get the length of scores array from the first entry
+    const numIterations = leaderboardData[0].scores?.length || 0;
+    
+    console.log("Number of iterations:", numIterations);
+    
+    if (numIterations === 0) return [];
+    
+    // Create data points for each iteration
+    const iterations = _.range(numIterations).map(iteration => {
+      const point = { iteration: `Iteration ${iteration}` };
+      
+      leaderboardData.forEach(entry => {
+        const score = entry.scores?.[iteration];
+        if (score !== undefined) {
+          point[entry.team_name] = score;
+        }
+      });
+      
+      console.log(`Iteration ${iteration} point:`, point);  // Debug each point
+      return point;
     });
-    return point;
-  });
+    
+    return iterations;
+  }, [leaderboardData]);
+
+  // Get final scores for leaderboard table
+  const finalScores = useMemo(() => {
+    const teams = _.uniq(leaderboardData.map(entry => entry.team_name));
+    return teams.map(team => {
+      const entries = leaderboardData.filter(entry => entry.team_name === team);
+      const latestEntry = _.maxBy(entries, 'submission_date');
+      return {
+        team_name: team,
+        score: latestEntry.score,
+        submission_date: latestEntry.submission_date,
+        rank: 0 // Will be calculated below
+      };
+    })
+    .sort((a, b) => b.score - a.score)
+    .map((entry, index) => ({ ...entry, rank: index + 1 }));
+  }, [leaderboardData]);
+
+  // Get unique team names for chart lines
+  const teams = useMemo(() => 
+    Array.from(new Set(leaderboardData.map(entry => entry.team_name))),
+    [leaderboardData]
+  );
 
   return (
     <div className="space-y-8">
-      {/* SOTA Table */}
+      {/* Leaderboard Table */}
       <Card className="bg-gray-900 border-gray-800">
         <CardHeader>
           <CardTitle className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
@@ -41,25 +84,27 @@ const LeaderboardComponent: React.FC<LeaderboardComponentProps> = ({ leaderboard
                   <th className="p-4 text-left text-gray-400">Rank</th>
                   <th className="p-4 text-left text-gray-400">Team</th>
                   <th className="p-4 text-left text-gray-400">Score</th>
-                  <th className="p-4 text-left text-gray-400">Submissions</th>
+                  <th className="p-4 text-left text-gray-400">Last Submission</th>
                 </tr>
               </thead>
               <tbody>
-                {leaderboardData.map((entry) => (
-                  <tr key={entry.team} className="border-b border-gray-800 hover:bg-gray-800/50">
+                {finalScores.map((entry) => (
+                  <tr key={entry.team_name} className="border-b border-gray-800 hover:bg-gray-800/50">
                     <td className="p-4">
                       <Badge variant="outline" className="bg-purple-900/20">
                         #{entry.rank}
                       </Badge>
                     </td>
                     <td className="p-4">
-                      <span className="text-gray-300">{entry.team}</span>
+                      <span className="text-gray-300">{entry.team_name}</span>
                     </td>
                     <td className="p-4">
-                      <span className="text-cyan-400">{entry.score.toFixed(4)}</span>
+                      <span className="text-cyan-400">{entry.score.toFixed(2)}</span>
                     </td>
                     <td className="p-4">
-                      <span className="text-purple-400">{entry.submissions}</span>
+                      <span className="text-purple-400">
+                        {new Date(entry.submission_date).toLocaleDateString()}
+                      </span>
                     </td>
                   </tr>
                 ))}
@@ -75,12 +120,12 @@ const LeaderboardComponent: React.FC<LeaderboardComponentProps> = ({ leaderboard
           <CardTitle className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
             Performance Over Time
           </CardTitle>
-          <p className="text-gray-400">Training progress across iterations</p>
+          <p className="text-gray-400">Score progression by iteration</p>
         </CardHeader>
         <CardContent>
-          <div className="h-[400px] w-full">
+          <div className="h-96 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData}>
+              <LineChart data={timeSeriesData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#333" />
                 <XAxis 
                   dataKey="iteration" 
@@ -90,6 +135,7 @@ const LeaderboardComponent: React.FC<LeaderboardComponentProps> = ({ leaderboard
                 <YAxis 
                   stroke="#666"
                   style={{ fontSize: '12px' }}
+                  domain={[30, 45]}
                 />
                 <Tooltip 
                   contentStyle={{ 
@@ -99,14 +145,14 @@ const LeaderboardComponent: React.FC<LeaderboardComponentProps> = ({ leaderboard
                   }}
                 />
                 <Legend />
-                {leaderboardData.map((entry, index) => (
+                {teams.map((team, index) => (
                   <Line
-                    key={entry.team}
+                    key={team}
                     type="monotone"
-                    dataKey={entry.team}
+                    dataKey={team}
                     stroke={colors[index % colors.length]}
-                    dot={false}
                     strokeWidth={2}
+                    dot
                   />
                 ))}
               </LineChart>

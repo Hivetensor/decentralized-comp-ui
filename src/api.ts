@@ -1,6 +1,6 @@
 import { Competition, LeaderboardEntry, UserProfile } from './types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8101';
 
 export const api = {
   competitions: {
