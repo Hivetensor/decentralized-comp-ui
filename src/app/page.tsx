@@ -2,36 +2,6 @@ import React from 'react';
 import { Badge } from "@/components/ui/badge";
 import Link from 'next/link'; // Add this import at the top
 
-// Sample data - in real app, this would come from your API/database
-const featuredCompetitions = [
-  {
-    id: 1,
-    title: "Neural Network Challenge 2024",
-    prize: "50,000 USDC",
-    participants: 1234,
-    deadline: "5 days left",
-    difficulty: "Advanced",
-    tags: ["AI", "Deep Learning"]
-  },
-  {
-    id: 2,
-    title: "Quantum Computing Optimization",
-    prize: "25,000 USDC",
-    participants: 856,
-    deadline: "12 days left",
-    difficulty: "Expert",
-    tags: ["Quantum", "Optimization"]
-  },
-  {
-    id: 3,
-    title: "Blockchain Data Analysis",
-    prize: "30,000 USDC",
-    participants: 567,
-    deadline: "8 days left",
-    difficulty: "Intermediate",
-    tags: ["Blockchain", "Analytics"]
-  }
-];
 
 const HomePage = () => {
   return (
