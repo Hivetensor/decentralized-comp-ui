@@ -26,14 +26,14 @@ const LeaderboardComponent = ({ leaderboardData }:any) => {
     
     if (numIterations === 0) return [];
     
-    // @ts-ignore
+    // @ts-expect-error
     const iterations = range(numIterations).map(iteration => {
       const point = { iteration: `Iteration ${iteration}` };
-      // @ts-ignore
+      // @ts-expect-error
       leaderboardData.forEach(entry => {
         const score = entry.scores?.[iteration];
         if (score !== undefined) {
-          // @ts-ignore
+          // @ts-expect-error
           point[entry.team_name] = score;
         }
       });
@@ -47,11 +47,11 @@ const LeaderboardComponent = ({ leaderboardData }:any) => {
 
   // Get final scores for leaderboard table
   const finalScores = useMemo(() => {
-    // @ts-ignore
+    // @ts-expect-error
     const teams = uniq(leaderboardData.map(entry => entry.team_name));
-    // @ts-ignore
+    // @ts-expect-error
     return teams.map(team => {
-      // @ts-ignore
+      // @ts-expect-error
       const entries = leaderboardData.filter(entry => entry.team_name === team);
       const latestEntry = maxBy(entries, 'submission_date');
       return {
@@ -60,13 +60,13 @@ const LeaderboardComponent = ({ leaderboardData }:any) => {
         submission_date: latestEntry.submission_date,
         rank: 0 // Will be calculated below
       };
-    })// @ts-ignore
-    .sort((a, b) => b.score - a.score)// @ts-ignore
+    })// @ts-expect-error
+    .sort((a, b) => b.score - a.score)// @ts-expect-error
     .map((entry, index) => ({ ...entry, rank: index + 1 }));
   }, [leaderboardData]);
 
   // Get unique team names for chart lines
-  const teams = useMemo(() => // @ts-ignore
+  const teams = useMemo(() => // @ts-expect-error
     Array.from(new Set(leaderboardData.map(entry => entry.team_name))),
     [leaderboardData]
   );
@@ -92,7 +92,7 @@ const LeaderboardComponent = ({ leaderboardData }:any) => {
                 </tr>
               </thead>
               <tbody> 
-                {// @ts-ignore
+                {// @ts-expect-error
                 finalScores.map((entry) => (
                   <tr key={entry.team_name} className="border-b border-gray-800 hover:bg-gray-800/50">
                     <td className="p-4">
@@ -151,7 +151,7 @@ const LeaderboardComponent = ({ leaderboardData }:any) => {
                 />
                 <Legend />
                 {teams.map((team, index) => (
-                  // @ts-ignore
+                  // @ts-expect-error
                   <Line
                     key={team}
                     type="monotone"
