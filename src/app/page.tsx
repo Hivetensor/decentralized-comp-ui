@@ -1,7 +1,5 @@
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Trophy, Users, Zap, Timer } from 'lucide-react';
 import Link from 'next/link'; // Add this import at the top
 
 // Sample data - in real app, this would come from your API/database
