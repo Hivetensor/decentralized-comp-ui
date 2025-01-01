@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import {maxBy, range, uniq} from 'lodash';
 
-const LeaderboardComponent = ({ leaderboardData }) => {
+const LeaderboardComponent = ({ leaderboardData }:any) => {
   const colors = [
     '#ff0099', '#00ff99', '#9900ff', '#ff9900', '#00ffff',
     '#ff00ff', '#99ff00', '#0099ff', '#ffff00', '#ff0000'
@@ -26,13 +26,14 @@ const LeaderboardComponent = ({ leaderboardData }) => {
     
     if (numIterations === 0) return [];
     
-    // Create data points for each iteration
+    // @ts-ignore
     const iterations = range(numIterations).map(iteration => {
       const point = { iteration: `Iteration ${iteration}` };
-      
+      // @ts-ignore
       leaderboardData.forEach(entry => {
         const score = entry.scores?.[iteration];
         if (score !== undefined) {
+          // @ts-ignore
           point[entry.team_name] = score;
         }
       });
@@ -46,8 +47,11 @@ const LeaderboardComponent = ({ leaderboardData }) => {
 
   // Get final scores for leaderboard table
   const finalScores = useMemo(() => {
+    // @ts-ignore
     const teams = uniq(leaderboardData.map(entry => entry.team_name));
+    // @ts-ignore
     return teams.map(team => {
+      // @ts-ignore
       const entries = leaderboardData.filter(entry => entry.team_name === team);
       const latestEntry = maxBy(entries, 'submission_date');
       return {
@@ -56,13 +60,13 @@ const LeaderboardComponent = ({ leaderboardData }) => {
         submission_date: latestEntry.submission_date,
         rank: 0 // Will be calculated below
       };
-    })
-    .sort((a, b) => b.score - a.score)
+    })// @ts-ignore
+    .sort((a, b) => b.score - a.score)// @ts-ignore
     .map((entry, index) => ({ ...entry, rank: index + 1 }));
   }, [leaderboardData]);
 
   // Get unique team names for chart lines
-  const teams = useMemo(() => 
+  const teams = useMemo(() => // @ts-ignore
     Array.from(new Set(leaderboardData.map(entry => entry.team_name))),
     [leaderboardData]
   );
@@ -87,8 +91,9 @@ const LeaderboardComponent = ({ leaderboardData }) => {
                   <th className="p-4 text-left text-gray-400">Last Submission</th>
                 </tr>
               </thead>
-              <tbody>
-                {finalScores.map((entry) => (
+              <tbody> 
+                {// @ts-ignore
+                finalScores.map((entry) => (
                   <tr key={entry.team_name} className="border-b border-gray-800 hover:bg-gray-800/50">
                     <td className="p-4">
                       <Badge variant="outline" className="bg-purple-900/20">
@@ -146,6 +151,7 @@ const LeaderboardComponent = ({ leaderboardData }) => {
                 />
                 <Legend />
                 {teams.map((team, index) => (
+                  // @ts-ignore
                   <Line
                     key={team}
                     type="monotone"
