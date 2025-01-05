@@ -53,12 +53,27 @@ const LeaderboardComponent = ({ leaderboardData }:any) => {
     return teams.map(team => {
       
       const entries = leaderboardData.filter(entry => entry.team_name === team);
-      const latestEntry = maxBy(entries, 'submission_date');
+      const latestEntry = leaderboardData.find((entry: any) => entry.team_name === team) as {
+        score: number;
+        submission_date: string;
+        team_name: string;
+      };
+      
+      // Add null check
+      if (!latestEntry) {
+        return {
+          team_name: team,
+          score: 0,
+          submission_date: new Date().toISOString(),
+          rank: 0
+        };
+      }
+      
       return {
         team_name: team,
         score: latestEntry.score,
         submission_date: latestEntry.submission_date,
-        rank: 0 // Will be calculated below
+        rank: 0
       };
     })
     .sort((a, b) => b.score - a.score)
