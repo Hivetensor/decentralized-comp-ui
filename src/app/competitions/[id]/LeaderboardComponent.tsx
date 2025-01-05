@@ -108,7 +108,7 @@ const LeaderboardComponent = ({ leaderboardData }:any) => {
               </thead>
               <tbody> 
                 {
-                finalScores.map((entry) => (
+                finalScores.map((entry: any) => (
                   <tr key={entry.team_name} className="border-b border-gray-800 hover:bg-gray-800/50">
                     <td className="p-4">
                       <Badge variant="outline" className="bg-purple-900/20">
