@@ -150,7 +150,7 @@ const LeaderboardComponent = ({ leaderboardData }:any) => {
                   }}
                 />
                 <Legend />
-                {teams.map((team, index) => (
+                {teams.map((team: string, index) => (
                   
                   <Line
                     key={team}
