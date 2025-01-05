@@ -4,8 +4,8 @@
         "src": "package.json",
         "use": "@vercel/next",
         "config": {
-          "typeCheckingMode": "off"  // Disables type checking during build
+          "typeCheckingMode": "off"
         }
       }
     ]
-  }
+}
