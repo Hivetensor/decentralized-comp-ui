@@ -1,11 +1,11 @@
 {
-    "builds": [
-      {
-        "src": "package.json",
-        "use": "@vercel/next",
-        "config": {
-          "typeCheckingMode": "off"
-        }
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next",
+      "config": {
+        "typeCheckingMode": "off"
       }
-    ]
+    }
+  ]
 }

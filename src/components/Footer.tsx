@@ -1,12 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import {
-    Twitter,
-    Github,
-    Linkedin,
-    Youtube,
-} from 'lucide-react';
+import {Github, Linkedin, Twitter, Youtube,} from 'lucide-react';
 
 const Footer = () => {
     return (
@@ -64,16 +59,16 @@ const Footer = () => {
                         <h3 className="text-xl font-semibold mb-4 text-white">Connect</h3>
                         <div className="flex space-x-4 mb-4">
                             <a href="https://twitter.com/your-handle" className="hover:text-white">
-                                <Twitter className="h-6 w-6" />
+                                <Twitter className="h-6 w-6"/>
                             </a>
                             <a href="https://github.com/your-org" className="hover:text-white">
-                                <Github className="h-6 w-6" />
+                                <Github className="h-6 w-6"/>
                             </a>
                             <a href="https://linkedin.com/company/your-company" className="hover:text-white">
-                                <Linkedin className="h-6 w-6" />
+                                <Linkedin className="h-6 w-6"/>
                             </a>
                             <a href="https://youtube.com/@your-channel" className="hover:text-white">
-                                <Youtube className="h-6 w-6" />
+                                <Youtube className="h-6 w-6"/>
                             </a>{/*
                             <a href="https://discord.gg/your-server" className="hover:text-white">
                                 <Discord className="h-6 w-6" />

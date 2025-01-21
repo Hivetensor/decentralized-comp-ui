@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import Link from 'next/link';
-import { Button } from "@/components/ui/button";
-import { WalletCards } from 'lucide-react';
+import {Button} from "@/components/ui/button";
+import {WalletCards} from 'lucide-react';
 
 const NavigationMenu = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -23,7 +23,8 @@ const NavigationMenu = () => {
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         >
                             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                                      d="M4 6h16M4 12h16M4 18h16"/>
                             </svg>
                         </button>
                     </div>
@@ -31,19 +32,23 @@ const NavigationMenu = () => {
                     {/* Logo and desktop nav */}
                     <div className="flex items-center md:flex-1">
                         <Link href="/" className="mx-auto md:mx-0">
-              <span className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400 ">
+              <span
+                  className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400 ">
                 HiveTensor
               </span>
                         </Link>
 
                         <div className="hidden md:flex items-center ml-10 space-x-8">
-                            <Link href="/competitions" className="text-gray-300 hover:text-white transition-colors text-base font-medium">
+                            <Link href="/competitions"
+                                  className="text-gray-300 hover:text-white transition-colors text-base font-medium">
                                 Competitions
                             </Link>
-                            <Link href="/datasets" className="text-gray-300 hover:text-white transition-colors text-base font-medium">
+                            <Link href="/datasets"
+                                  className="text-gray-300 hover:text-white transition-colors text-base font-medium">
                                 Datasets
                             </Link>
-                            <Link href="/leaderboard" className="text-gray-300 hover:text-white transition-colors text-base font-medium">
+                            <Link href="/leaderboard"
+                                  className="text-gray-300 hover:text-white transition-colors text-base font-medium">
                                 Leaderboard
                             </Link>
                         </div>
@@ -64,8 +69,9 @@ const NavigationMenu = () => {
                             </>
                         ) : (
                             <Link href="/auth">
-                                <Button className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700">
-                                    <WalletCards className="mr-2 h-4 w-4" />
+                                <Button
+                                    className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700">
+                                    <WalletCards className="mr-2 h-4 w-4"/>
                                     <span className="hidden md:inline">Connect Wallet</span>
                                     <span className="md:hidden">Link Wallet</span>
                                 </Button>
