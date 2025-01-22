@@ -4,12 +4,29 @@ import React, {useState} from 'react';
 import Link from 'next/link';
 import {Button} from "@/components/ui/button";
 import {WalletCards} from 'lucide-react';
+import {useWallet} from "@/hooks/useWallet";
+import {toast} from "@/hooks/use-toast";
 
 const NavigationMenu = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const {address, isConnecting, connectWallet, isConnected} = useWallet();
 
-    const isLoggedIn = false;
-    const userAddress = '0x1234...5678';
+    const handleConnect = async () => {
+        try {
+            await connectWallet();
+            toast({
+                title: "Wallet Connected",
+                description: "Successfully connected to your wallet",
+            });
+        } catch (error) {
+            toast({
+                title: "Connection Failed",
+                description: error instanceof Error ? error.message : "Failed to connect wallet",
+                variant: "destructive"
+            });
+        }
+    };
+
 
     return (
         <div className="bg-gray-900 border-b border-gray-800">
@@ -55,29 +72,30 @@ const NavigationMenu = () => {
                     </div>
 
                     {/* Auth section */}
-                    <div className="flex items-center">
-                        {isLoggedIn ? (
-                            <>
-                                <code className="hidden md:block bg-gray-800 px-3 py-1 rounded text-sm text-gray-300">
-                                    {userAddress}
-                                </code>
-                                <Link href="/profile">
-                                    <Button variant="ghost" className="text-gray-300 hover:text-white">
-                                        Profile
-                                    </Button>
-                                </Link>
-                            </>
-                        ) : (
-                            <Link href="/auth">
-                                <Button
-                                    className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700">
-                                    <WalletCards className="mr-2 h-4 w-4"/>
-                                    <span className="hidden md:inline">Connect Wallet</span>
-                                    <span className="md:hidden">Link Wallet</span>
+                    {isConnected ? (
+                        <>
+                            <code className="hidden md:block bg-gray-800 px-3 py-1 rounded text-sm text-gray-300">
+                                {address?.slice(0, 6)}...{address?.slice(-4)}
+                            </code>
+                            <Link href="/profile">
+                                <Button variant="ghost" className="text-gray-300 hover:text-white">
+                                    Profile
                                 </Button>
                             </Link>
-                        )}
-                    </div>
+                        </>
+                    ) : (
+                        <Button
+                            onClick={handleConnect}
+                            disabled={isConnecting}
+                            className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700"
+                        >
+                            <WalletCards className="mr-2 h-4 w-4"/>
+                            <span className="hidden md:inline">
+                    {isConnecting ? 'Connecting...' : 'Connect Wallet'}
+                </span>
+                            <span className="md:hidden">Link Wallet</span>
+                        </Button>
+                    )}
                 </div>
             </div>
 

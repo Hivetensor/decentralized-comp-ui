@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import NavigationMenu from '@/components/NavigationMenu';
 import Footer from '@/components/Footer';
+import {WalletProvider} from "@/contexts/WalletContext";
 
 
 const geistSans = localFont({
@@ -26,9 +27,11 @@ export default function RootLayout({
     return (
         <html lang="en" className={geistSans.className}>
         <body>
+        <WalletProvider>
         <NavigationMenu/>
         {children}
         <Footer/>
+        </WalletProvider>
         </body>
         </html>
     );
