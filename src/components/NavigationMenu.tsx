@@ -14,11 +14,13 @@ const NavigationMenu = () => {
     const handleConnect = async () => {
         try {
             await connectWallet();
+            console.log("Connected to wallet");
             toast({
                 title: "Wallet Connected",
                 description: "Successfully connected to your wallet",
             });
         } catch (error) {
+            console.error("Failed to connect wallet:", error);
             toast({
                 title: "Connection Failed",
                 description: error instanceof Error ? error.message : "Failed to connect wallet",
