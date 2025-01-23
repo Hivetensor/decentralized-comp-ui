@@ -1,6 +1,7 @@
+// hooks/useCompetition.ts
 import {useEffect, useState} from 'react';
-import {Competition, LeaderboardEntry} from '../types';
-import {api} from '../api';
+import {Competition, LeaderboardEntry} from '@/types';
+import {competitionService} from '@/services/competitions';
 
 export function useCompetitions(params?: {
     search?: string;
@@ -17,7 +18,7 @@ export function useCompetitions(params?: {
             try {
                 setLoading(true);
                 setError(null);
-                const data = await api.competitions.getCompetitions(params);
+                const data = await competitionService.getCompetitions(params);
                 setCompetitions(data);
             } catch (err) {
                 setError(err instanceof Error ? err : new Error('Failed to fetch competitions'));
@@ -44,8 +45,8 @@ export function useCompetitionDetail(id: number) {
                 setLoading(true);
                 setError(null);
                 const [competitionData, leaderboardData] = await Promise.all([
-                    api.competitions.getCompetition(id),
-                    api.competitions.getLeaderboard(id)
+                    competitionService.getCompetition(id),
+                    competitionService.getLeaderboard(id)
                 ]);
                 setCompetition(competitionData);
                 setLeaderboard(leaderboardData);

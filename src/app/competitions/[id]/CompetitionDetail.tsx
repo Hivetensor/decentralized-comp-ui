@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, {useState} from 'react';
 import {useParams} from 'next/navigation';
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Badge} from "@/components/ui/badge";
@@ -9,11 +9,30 @@ import {Loader2, Play, Timer, Trophy, Users} from 'lucide-react';
 import {Alert, AlertDescription} from "@/components/ui/alert";
 import {useCompetitionDetail} from '@/hooks/useCompetition';
 import LeaderboardComponent from './LeaderboardComponent';
+import {UserRegistrationModal} from "@/components/UserRegistrationModal";
+import {useUser} from "@/contexts/UserContext";
 
 const CompetitionDetail = () => {
     const params = useParams();
     const competitionId = Number(params.id);
     const {competition, leaderboard, loading, error} = useCompetitionDetail(competitionId);
+    const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+    const {user, registerUser, joinCompetition, isInCompetition} = useUser();
+
+
+    const handleJoinClick = () => {
+        setShowRegistrationModal(true);
+    };
+
+    const handleRegistrationSubmit = async (data: { username: string; walletAddress: string }) => {
+        try {
+            registerUser(data.username, data.walletAddress);
+            joinCompetition(competition.id);
+            setShowRegistrationModal(false);
+        } catch (error) {
+            console.error('Registration failed:', error);
+        }
+    };
 
     if (loading) {
         return (
@@ -44,17 +63,38 @@ const CompetitionDetail = () => {
             {/* Header */}
             <div className="bg-gradient-to-r from-purple-900/50 to-cyan-900/50 p-8">
                 <div className="max-w-7xl mx-auto">
-                    <div className="flex items-center gap-4 mb-4">
-                        {competition.tags.map((tag) => (
-                            <Badge key={tag} className="bg-gray-800 text-gray-300">
-                                {tag}
-                            </Badge>
-                        ))}
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div className="flex-1">
+                            <div className="flex items-center gap-4 mb-4">
+                                {competition.tags.map((tag) => (
+                                    <Badge key={tag} className="bg-gray-800 text-gray-300">
+                                        {tag}
+                                    </Badge>
+                                ))}
+                            </div>
+                            <h1 className="text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
+                                {competition.title}
+                            </h1>
+                            <p className="text-gray-300 max-w-3xl">{competition.description}</p>
+                        </div>
+
+                        {/* Join Button or Status */}
+                        <div className="w-full md:w-auto">
+                            {!isInCompetition(competitionId) ? (
+                                <button
+                                    className="w-full md:w-auto px-10 py-4 text-lg bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 rounded-md text-white font-medium"
+                                    onClick={handleJoinClick}
+                                >
+                                    Join Competition
+                                </button>
+                            ) : (
+                                <div className="text-green-400 font-medium">
+                                    Already Joined
+                                </div>)}
+
+
+                        </div>
                     </div>
-                    <h1 className="text-4xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
-                        {competition.title}
-                    </h1>
-                    <p className="text-gray-300 max-w-3xl">{competition.description}</p>
                 </div>
             </div>
 
@@ -165,6 +205,11 @@ const CompetitionDetail = () => {
                     </TabsContent>
                 </Tabs>
             </div>
+            <UserRegistrationModal
+                isOpen={showRegistrationModal}
+                onClose={() => setShowRegistrationModal(false)}
+                onSubmit={handleRegistrationSubmit}
+            />
         </div>
     );
 };
