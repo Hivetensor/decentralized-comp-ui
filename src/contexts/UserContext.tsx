@@ -5,7 +5,14 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 interface User {
     username: string;
     walletAddress: string;
-    joinedCompetitions: number[];  // Array of competition IDs
+    joinedAt: string;
+    competitions: {
+        id: number;
+        title: string;
+        rank?: number;
+        status: 'active' | 'completed';
+        joinedAt: string;
+    }[];
 }
 
 interface UserContextType {
@@ -20,7 +27,6 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export function UserProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
 
-    // Load user data from localStorage on mount
     useEffect(() => {
         const savedUser = localStorage.getItem('user');
         if (savedUser) {
@@ -32,32 +38,41 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         const newUser = {
             username,
             walletAddress,
-            joinedCompetitions: []
+            joinedAt: new Date().toISOString(),
+            competitions: []
         };
         setUser(newUser);
         localStorage.setItem('user', JSON.stringify(newUser));
     };
 
-    const joinCompetition = (competitionId: number) => {
+    const joinCompetition = (competitionId: number, competitionTitle: string = '') => {
         if (!user) return;
 
         const updatedUser = {
             ...user,
-            joinedCompetitions: [...user.joinedCompetitions, competitionId]
+            competitions: [
+                ...user.competitions,
+                {
+                    id: competitionId,
+                    title: competitionTitle,
+                    status: 'active',
+                    joinedAt: new Date().toISOString()
+                }
+            ]
         };
         setUser(updatedUser);
         localStorage.setItem('user', JSON.stringify(updatedUser));
     };
 
     const isInCompetition = (competitionId: number) => {
-        return user?.joinedCompetitions.includes(competitionId) ?? false;
+        return user?.competitions.some(comp => comp.id === competitionId) ?? false;
     };
 
     return (
         <UserContext.Provider value={{ user, registerUser, joinCompetition, isInCompetition }}>
-    {children}
-    </UserContext.Provider>
-);
+            {children}
+        </UserContext.Provider>
+    );
 }
 
 export function useUser() {

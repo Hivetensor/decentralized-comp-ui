@@ -2,9 +2,14 @@
 
 import React, {useState} from 'react';
 import Link from 'next/link';
+import { UserCircle}  from "lucide-react";
+import { useUser } from '@/contexts/UserContext';
 
 const NavigationMenu = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+    const { user } = useUser();
+
 
     return (
         <div className="bg-gray-900 border-b border-gray-800">
@@ -38,6 +43,56 @@ const NavigationMenu = () => {
                         </div>
                     </div>
 
+                    {/* Profile Section */}
+                    <div className="relative">
+                        {user ? (
+                            <>
+                                <button
+                                    onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                                    className="flex items-center gap-2 text-gray-300 hover:text-white"
+                                >
+                                    <UserCircle className="h-6 w-6" />
+                                    <span className="hidden md:block">{user.username}</span>
+                                </button>
+
+                                {/* Profile Dropdown */}
+                                {profileDropdownOpen && (
+                                    <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-gray-800 ring-1 ring-black ring-opacity-5 z-50">
+                                        <Link
+                                            href={`/profile/${user.walletAddress}`}
+                                            className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
+                                            onClick={() => setProfileDropdownOpen(false)}
+                                        >
+                                            View Profile
+                                        </Link>
+                                        <div className="border-t border-gray-700 my-1" />
+                                        <div className="px-4 py-2">
+                                            <div className="text-sm text-gray-400">
+                                                Active Competitions
+                                            </div>
+                                            <div className="text-sm font-medium text-white">
+                                                {user.competitions?.filter(c => c.status === 'active').length || 0}
+                                            </div>
+                                        </div>
+                                        <div className="border-t border-gray-700 my-1" />
+                                        <button
+                                            onClick={() => {
+                                                localStorage.removeItem('user');
+                                                window.location.reload();
+                                            }}
+                                            className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700"
+                                        >
+                                            Log Out
+                                        </button>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <Link href="/competitions" className="text-gray-300 hover:text-white">
+                                <UserCircle className="h-6 w-6" />
+                            </Link>
+                        )}
+                    </div>
                     {/* Mobile Menu Button - right aligned */}
                     <div className="md:hidden flex items-center">
                         <button

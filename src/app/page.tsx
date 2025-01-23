@@ -23,7 +23,7 @@ const HomePage = () => {
                                         Join a Competition
                                     </button>
                                 </Link>
-                                <Link href="/competitions/create">
+                                <Link href="/host">
                                     <button className="w-full md:w-auto px-6 md:px-10 py-4 md:py-8 text-base md:text-lg bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 rounded-md">
                                         Host a Competition
                                     </button>

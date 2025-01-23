@@ -22,20 +22,13 @@ export interface LeaderboardEntry {
 
 export interface UserProfile {
     username: string;
-    publicKey: string;
-    joinDate: string;
-    stats: {
-        totalCompetitions: number;
-        bestRank: number;
-        totalSubmissions: number;
-        averageScore: number;
-    };
-    recentCompetitions: Array<{
-        id: string;
-        name: string;
-        rank: number;
-        score: number;
-        totalParticipants: number;
-        date: string;
-    }>;
+    walletAddress: string;
+    joinedAt: string;
+    competitions: {
+        id: number;
+        title: string;
+        rank?: number;
+        status: 'active' | 'completed';
+        joinedAt: string;
+    }[];
 }
