@@ -20,23 +20,6 @@ const Footer = () => {
                         </ul>
                     </div>
 
-                    {/* Column 2 */}
-                    <div>
-                        <h3 className="text-lg font-semibold mb-4 text-white">Learn</h3>
-                        <ul className="space-y-2">
-                            <li>
-                                <Link href="/learning-center" className="hover:text-white transition-colors">
-                                    Learning Center
-                                </Link>
-                            </li>
-                            <li>
-                                <Link href="/chat" className="hover:text-white transition-colors">
-                                    Chat
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
-
                     {/* Column 3 */}
                     <div>
                         <h3 className="text-lg font-semibold mb-4 text-white">Opportunities</h3>

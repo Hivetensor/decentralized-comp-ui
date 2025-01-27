@@ -55,7 +55,7 @@ const HostDashboard = () => {
                             Manage your AI competitions
                         </p>
                     </div>
-                    <Link href="/host/create-competition">
+                    <Link href="/host/createCompetition">
                         <Button
                             className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700">
                             <Plus className="h-4 w-4 mr-2"/>
