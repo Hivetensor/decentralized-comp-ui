@@ -1,15 +1,15 @@
 // CompetitionList.tsx
 'use client';
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Play, Search, Timer, Trophy, Users, Zap } from 'lucide-react';
+import React, {useEffect, useState} from 'react';
+import {Card, CardContent} from "@/components/ui/card";
+import {Badge} from "@/components/ui/badge";
+import {Input} from "@/components/ui/input";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {Loader2, Play, Search, Timer, Trophy, Users, Zap} from 'lucide-react';
 import Link from 'next/link';
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { api } from '@/services/api';
-import { Competition } from '@/types';
+import {Alert, AlertDescription} from "@/components/ui/alert";
+import {api} from '@/services/api';
+import {Competition} from '@/types';
 
 const CompetitionList = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -169,7 +169,8 @@ const CompetitionList = () => {
                                             <p className="text-gray-400 mb-4">{competition.description}</p>
                                             <div className="flex flex-wrap gap-2 mb-4">
                                                 {competition.tags.map((tag) => (
-                                                    <Badge key={tag} variant="secondary" className="bg-gray-800 text-gray-300">
+                                                    <Badge key={tag} variant="secondary"
+                                                           className="bg-gray-800 text-gray-300">
                                                         {tag}
                                                     </Badge>
                                                 ))}
@@ -182,7 +183,8 @@ const CompetitionList = () => {
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <Users className="w-5 h-5 text-blue-400"/>
-                                                <span className="text-gray-400">{competition.participants} participants</span>
+                                                <span
+                                                    className="text-gray-400">{competition.participants} participants</span>
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <Play className="w-5 h-5 text-yellow-400"/>

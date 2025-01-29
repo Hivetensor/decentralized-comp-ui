@@ -1,5 +1,5 @@
-import { Competition, LeaderboardEntry } from '@/types';
-import { mockCompetitions, mockLeaderboard } from '@/mock/competitions';
+import {Competition, LeaderboardEntry} from '@/types';
+import {mockCompetitions, mockLeaderboard} from '@/mock/competitions';
 
 // Flag to switch between mock and real API
 const USE_MOCK = true;

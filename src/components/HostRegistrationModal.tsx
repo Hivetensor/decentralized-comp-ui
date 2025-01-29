@@ -1,12 +1,12 @@
 // components/HostRegistrationModal.tsx
 'use client';
 
-import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Mail, Building, User, X } from 'lucide-react';
-import { z } from "zod";
+import React, {useState} from 'react';
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {Building, Mail, User, X} from 'lucide-react';
+import {z} from "zod";
 
 const hostSchema = z.object({
     email: z.string()
@@ -25,7 +25,7 @@ interface HostRegistrationModalProps {
     onSubmit: (data: { email: string; organization: string; contactName: string }) => void;
 }
 
-export const HostRegistrationModal = ({ isOpen, onClose, onSubmit }: HostRegistrationModalProps) => {
+export const HostRegistrationModal = ({isOpen, onClose, onSubmit}: HostRegistrationModalProps) => {
     const [formData, setFormData] = useState({
         email: '',
         organization: '',
@@ -68,7 +68,7 @@ export const HostRegistrationModal = ({ isOpen, onClose, onSubmit }: HostRegistr
                         Register as Host
                     </h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-white">
-                        <X className="h-5 w-5" />
+                        <X className="h-5 w-5"/>
                     </button>
                 </div>
 
@@ -76,7 +76,7 @@ export const HostRegistrationModal = ({ isOpen, onClose, onSubmit }: HostRegistr
                     <div className="space-y-2">
                         <Label className="text-gray-200">Email</Label>
                         <div className="relative">
-                            <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                            <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400"/>
                             <Input
                                 type="email"
                                 required
@@ -85,7 +85,7 @@ export const HostRegistrationModal = ({ isOpen, onClose, onSubmit }: HostRegistr
                                 }`}
                                 placeholder="Enter your email"
                                 value={formData.email}
-                                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                                onChange={(e) => setFormData(prev => ({...prev, email: e.target.value}))}
                             />
                             {errors.email && (
                                 <p className="text-red-400 text-sm mt-1">{errors.email}</p>
@@ -96,7 +96,7 @@ export const HostRegistrationModal = ({ isOpen, onClose, onSubmit }: HostRegistr
                     <div className="space-y-2">
                         <Label className="text-gray-200">Organization</Label>
                         <div className="relative">
-                            <Building className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                            <Building className="absolute left-3 top-3 h-4 w-4 text-gray-400"/>
                             <Input
                                 required
                                 className={`pl-10 bg-gray-700/50 border-gray-600 text-white ${
@@ -104,7 +104,7 @@ export const HostRegistrationModal = ({ isOpen, onClose, onSubmit }: HostRegistr
                                 }`}
                                 placeholder="Organization name"
                                 value={formData.organization}
-                                onChange={(e) => setFormData(prev => ({ ...prev, organization: e.target.value }))}
+                                onChange={(e) => setFormData(prev => ({...prev, organization: e.target.value}))}
                             />
                             {errors.organization && (
                                 <p className="text-red-400 text-sm mt-1">{errors.organization}</p>
@@ -115,7 +115,7 @@ export const HostRegistrationModal = ({ isOpen, onClose, onSubmit }: HostRegistr
                     <div className="space-y-2">
                         <Label className="text-gray-200">Contact Name</Label>
                         <div className="relative">
-                            <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                            <User className="absolute left-3 top-3 h-4 w-4 text-gray-400"/>
                             <Input
                                 required
                                 className={`pl-10 bg-gray-700/50 border-gray-600 text-white ${
@@ -123,7 +123,7 @@ export const HostRegistrationModal = ({ isOpen, onClose, onSubmit }: HostRegistr
                                 }`}
                                 placeholder="Your full name"
                                 value={formData.contactName}
-                                onChange={(e) => setFormData(prev => ({ ...prev, contactName: e.target.value }))}
+                                onChange={(e) => setFormData(prev => ({...prev, contactName: e.target.value}))}
                             />
                             {errors.contactName && (
                                 <p className="text-red-400 text-sm mt-1">{errors.contactName}</p>

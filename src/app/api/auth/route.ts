@@ -1,18 +1,18 @@
 // app/api/auth/route.ts
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import {NextResponse} from 'next/server';
+import {prisma} from '@/lib/prisma';
 
 export async function POST(req: Request) {
     try {
-        const { walletAddress } = await req.json();
+        const {walletAddress} = await req.json();
 
         let user = await prisma.user.findUnique({
-            where: { walletAddress }
+            where: {walletAddress}
         });
 
         if (!user) {
             user = await prisma.user.create({
-                data: { walletAddress }
+                data: {walletAddress}
             });
         }
 
@@ -20,8 +20,8 @@ export async function POST(req: Request) {
     } catch (error) {
         console.error('Auth error:', error);
         return NextResponse.json(
-            { error: 'Failed to authenticate' },
-            { status: 500 }
+            {error: 'Failed to authenticate'},
+            {status: 500}
         );
     }
 }

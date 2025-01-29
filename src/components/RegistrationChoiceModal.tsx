@@ -1,6 +1,6 @@
 // components/RegistrationChoiceModal.tsx
 import React from 'react';
-import { X } from 'lucide-react';
+import {X} from 'lucide-react';
 
 interface RegistrationChoiceModalProps {
     isOpen: boolean;
@@ -9,7 +9,12 @@ interface RegistrationChoiceModalProps {
     onChooseHost: () => void;
 }
 
-export const RegistrationChoiceModal = ({ isOpen, onClose, onChooseCompetitor, onChooseHost }: RegistrationChoiceModalProps) => {
+export const RegistrationChoiceModal = ({
+                                            isOpen,
+                                            onClose,
+                                            onChooseCompetitor,
+                                            onChooseHost
+                                        }: RegistrationChoiceModalProps) => {
     if (!isOpen) return null;
 
     return (
@@ -20,7 +25,7 @@ export const RegistrationChoiceModal = ({ isOpen, onClose, onChooseCompetitor, o
                         Choose Registration Type
                     </h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-white">
-                        <X className="h-5 w-5" />
+                        <X className="h-5 w-5"/>
                     </button>
                 </div>
 

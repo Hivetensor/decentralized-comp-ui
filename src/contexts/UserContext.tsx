@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
 
 interface User {
     username: string;
@@ -24,7 +24,7 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export function UserProvider({ children }: { children: React.ReactNode }) {
+export function UserProvider({children}: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
@@ -69,7 +69,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <UserContext.Provider value={{ user, registerUser, joinCompetition, isInCompetition }}>
+        <UserContext.Provider value={{user, registerUser, joinCompetition, isInCompetition}}>
             {children}
         </UserContext.Provider>
     );

@@ -5,7 +5,7 @@ import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {z} from "zod";
-import { X } from 'lucide-react'; // Add this import
+import {X} from 'lucide-react'; // Add this import
 
 interface UserRegistrationModalProps {
     isOpen: boolean;
@@ -64,7 +64,7 @@ export const UserRegistrationModal = ({isOpen, onClose, onSubmit}: UserRegistrat
                         Register as Competitor
                     </h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-white">
-                        <X className="h-5 w-5" />
+                        <X className="h-5 w-5"/>
                     </button>
                 </div>
 

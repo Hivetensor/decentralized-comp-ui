@@ -1,11 +1,11 @@
-import { API_CONFIG } from '@/config/api';
+import {API_CONFIG} from '@/config/api';
 
 export const api = {
     users: {
         register: async (data: { username: string, walletAddress: string }) => {
             const response = await fetch(`${API_CONFIG.BASE_URL}/users/register`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
             });
             if (!response.ok) {
@@ -31,7 +31,7 @@ export const api = {
         register: async (data: { email: string, organization: string, contactName: string }) => {
             const response = await fetch(`${API_CONFIG.BASE_URL}/hosts/register`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
             });
             if (!response.ok) {
@@ -44,7 +44,7 @@ export const api = {
         createCompetition: async (hostId: number, data: any) => {
             const response = await fetch(`${API_CONFIG.BASE_URL}/hosts/${hostId}/create-competition`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
             });
             if (!response.ok) {

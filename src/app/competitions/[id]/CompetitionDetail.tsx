@@ -1,25 +1,25 @@
 // CompetitionDetail.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Play, Timer, Trophy, Users } from 'lucide-react';
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { UserRegistrationModal } from '@/components/UserRegistrationModal';
-import { useUser } from '@/contexts/UserContext';
-import { api } from '@/services/api';
-import { toast } from '@/hooks/use-toast';
+import React, {useEffect, useState} from 'react';
+import {useParams} from 'next/navigation';
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Badge} from "@/components/ui/badge";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {Loader2, Play, Timer, Trophy, Users} from 'lucide-react';
+import {Alert, AlertDescription} from "@/components/ui/alert";
+import {Button} from "@/components/ui/button";
+import {UserRegistrationModal} from '@/components/UserRegistrationModal';
+import {useUser} from '@/contexts/UserContext';
+import {api} from '@/services/api';
+import {toast} from '@/hooks/use-toast';
 import LeaderboardComponent from './LeaderboardComponent';
-import { Competition, LeaderboardEntry } from '@/types';
+import {Competition, LeaderboardEntry} from '@/types';
 
 const CompetitionDetail = () => {
     const params = useParams();
     const competitionId = Number(params.id);
-    const { user, isInCompetition } = useUser();
+    const {user, isInCompetition} = useUser();
 
     const [competition, setCompetition] = useState<Competition | null>(null);
     const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -171,7 +171,8 @@ const CompetitionDetail = () => {
                                     Join Competition
                                 </button>
                             ) : (
-                                <div className="text-green-400 font-medium bg-green-900/20 px-6 py-3 rounded-md border border-green-500/20">
+                                <div
+                                    className="text-green-400 font-medium bg-green-900/20 px-6 py-3 rounded-md border border-green-500/20">
                                     Already Joined
                                 </div>
                             )}

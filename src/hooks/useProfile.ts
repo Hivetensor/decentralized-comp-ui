@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { UserProfile } from '@/types';
+import {useEffect, useState} from 'react';
+import {UserProfile} from '@/types';
 
 export function useProfile(walletAddress: string | null) {
     const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -51,5 +51,5 @@ export function useProfile(walletAddress: string | null) {
         updateProfile(updatedProfile);
     };
 
-    return { profile, loading, error, updateProfile, joinCompetition };
+    return {profile, loading, error, updateProfile, joinCompetition};
 }

@@ -1,13 +1,13 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
-import { useUser } from '@/contexts/UserContext';
-import { Button } from '@/components/ui/button';
+import {useRouter} from 'next/navigation';
+import {useUser} from '@/contexts/UserContext';
+import {Button} from '@/components/ui/button';
 
 const HomePage = () => {
     const router = useRouter();
-    const { user } = useUser();
+    const {user} = useUser();
 
     const handleJoinClick = () => {
         if (user) {
@@ -60,7 +60,8 @@ const HomePage = () => {
 
                         {/* Right content - Image placeholder */}
                         <div className="flex-1 w-full md:w-auto p-4 md:p-8">
-                            <div className="aspect-square bg-gray-800/50 rounded-lg flex items-center justify-center text-gray-400 text-sm md:text-base">
+                            <div
+                                className="aspect-square bg-gray-800/50 rounded-lg flex items-center justify-center text-gray-400 text-sm md:text-base">
                                 Some image? Data/Neural net? brain
                             </div>
                         </div>
