@@ -1,90 +1,51 @@
+// LeaderboardComponent.tsx
 import React, {useMemo} from 'react';
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Badge} from "@/components/ui/badge";
 import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';
-import {range, uniq} from 'lodash';
+import {LeaderboardEntry} from '@/types';
 
-const LeaderboardComponent = ({leaderboardData}: any) => {
+interface LeaderboardComponentProps {
+    leaderboardData: LeaderboardEntry[];
+}
+
+const LeaderboardComponent = ({leaderboardData}: LeaderboardComponentProps) => {
     const colors = [
         '#ff0099', '#00ff99', '#9900ff', '#ff9900', '#00ffff',
         '#ff00ff', '#99ff00', '#0099ff', '#ffff00', '#ff0000'
     ];
 
-    // Transform data into iterations format
+    // Transform data for time series chart
     const timeSeriesData = useMemo(() => {
         if (!leaderboardData?.length) return [];
 
-        console.log("First entry complete:", JSON.stringify(leaderboardData[0], null, 2));
-        console.log("Type of scores:", typeof leaderboardData[0].scores);
-        console.log("Is scores array?", Array.isArray(leaderboardData[0].scores));
-        console.log("Scores value:", leaderboardData[0].scores);
-
-        // Get the length of scores array from the first entry
         const numIterations = leaderboardData[0].scores?.length || 0;
-
-        console.log("Number of iterations:", numIterations);
-
         if (numIterations === 0) return [];
 
-
-        const iterations = range(numIterations).map(iteration => {
-            const point = {iteration: `Iteration ${iteration}`};
+        return Array.from({length: numIterations}, (_, iteration) => {
+            const point: { [key: string]: any } = {iteration: `Iteration ${iteration + 1}`};
 
             leaderboardData.forEach(entry => {
-                const score = entry.scores?.[iteration];
-                if (score !== undefined) {
-
-                    point[entry.team_name] = score;
+                if (entry.scores?.[iteration] !== undefined) {
+                    point[entry.team_name] = entry.scores[iteration];
                 }
             });
 
-            console.log(`Iteration ${iteration} point:`, point);  // Debug each point
             return point;
         });
-
-        return iterations;
     }, [leaderboardData]);
 
     // Get final scores for leaderboard table
     const finalScores = useMemo(() => {
-
-        const teams = uniq(leaderboardData.map(entry => entry.team_name));
-
-        return teams.map(team => {
-
-            const entries = leaderboardData.filter(entry => entry.team_name === team);
-            const latestEntry = leaderboardData.find((entry: any) => entry.team_name === team) as {
-                score: number;
-                submission_date: string;
-                team_name: string;
-            };
-
-            // Add null check
-            if (!latestEntry) {
-                return {
-                    team_name: team,
-                    score: 0,
-                    submission_date: new Date().toISOString(),
-                    rank: 0
-                };
-            }
-
-            return {
-                team_name: team,
-                score: latestEntry.score,
-                submission_date: latestEntry.submission_date,
-                rank: 0
-            };
-        })
-            .sort((a, b) => b.score - a.score)
-            .map((entry, index) => ({...entry, rank: index + 1}));
+        return leaderboardData
+            .map(entry => ({
+                team_name: entry.team_name,
+                score: entry.score,
+                submission_date: entry.submission_date,
+                rank: entry.rank
+            }))
+            .sort((a, b) => b.score - a.score);
     }, [leaderboardData]);
-
-    // Get unique team names for chart lines
-    const teams = useMemo(() =>
-            Array.from(new Set(leaderboardData.map(entry => entry.team_name))),
-        [leaderboardData]
-    );
 
     return (
         <div className="space-y-8">
@@ -107,27 +68,26 @@ const LeaderboardComponent = ({leaderboardData}: any) => {
                             </tr>
                             </thead>
                             <tbody>
-                            {
-                                finalScores.map((entry: any) => (
-                                    <tr key={entry.team_name} className="border-b border-gray-800 hover:bg-gray-800/50">
-                                        <td className="p-4">
-                                            <Badge variant="outline" className="bg-purple-900/20">
-                                                #{entry.rank}
-                                            </Badge>
-                                        </td>
-                                        <td className="p-4">
-                                            <span className="text-gray-300">{entry.team_name}</span>
-                                        </td>
-                                        <td className="p-4">
-                                            <span className="text-cyan-400">{entry.score.toFixed(2)}</span>
-                                        </td>
-                                        <td className="p-4">
-                      <span className="text-purple-400">
-                        {new Date(entry.submission_date).toLocaleDateString()}
-                      </span>
-                                        </td>
-                                    </tr>
-                                ))}
+                            {finalScores.map((entry) => (
+                                <tr key={entry.team_name} className="border-b border-gray-800 hover:bg-gray-800/50">
+                                    <td className="p-4">
+                                        <Badge variant="outline" className="bg-purple-900/20">
+                                            #{entry.rank}
+                                        </Badge>
+                                    </td>
+                                    <td className="p-4">
+                                        <span className="text-gray-300">{entry.team_name}</span>
+                                    </td>
+                                    <td className="p-4">
+                                        <span className="text-cyan-400">{entry.score.toFixed(4)}</span>
+                                    </td>
+                                    <td className="p-4">
+                                            <span className="text-purple-400">
+                                                {new Date(entry.submission_date).toLocaleString()}
+                                            </span>
+                                    </td>
+                                </tr>
+                            ))}
                             </tbody>
                         </table>
                     </div>
@@ -155,7 +115,6 @@ const LeaderboardComponent = ({leaderboardData}: any) => {
                                 <YAxis
                                     stroke="#666"
                                     style={{fontSize: '12px'}}
-                                    domain={[30, 45]}
                                 />
                                 <Tooltip
                                     contentStyle={{
@@ -165,12 +124,11 @@ const LeaderboardComponent = ({leaderboardData}: any) => {
                                     }}
                                 />
                                 <Legend/>
-                                {teams.map((team: string, index) => (
-
+                                {leaderboardData.map((entry, index) => (
                                     <Line
-                                        key={team}
+                                        key={entry.team_name}
                                         type="monotone"
-                                        dataKey={team}
+                                        dataKey={entry.team_name}
                                         stroke={colors[index % colors.length]}
                                         strokeWidth={2}
                                         dot

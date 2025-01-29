@@ -1,15 +1,71 @@
+// components/NavigationMenu.tsx
 'use client';
 
 import React, {useState} from 'react';
 import Link from 'next/link';
-import { UserCircle}  from "lucide-react";
-import { useUser } from '@/contexts/UserContext';
+import {useRouter} from 'next/navigation';
+import {useUser} from '@/contexts/UserContext';
+import {RegistrationChoiceModal} from './RegistrationChoiceModal';
+import {UserRegistrationModal} from '@/components/UserRegistrationModal';
+import {HostRegistrationModal} from '@/components/HostRegistrationModal';
+import {toast} from '@/hooks/use-toast';
+import {api} from '@/services/api';
 
 const NavigationMenu = () => {
+    const router = useRouter();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-    const { user } = useUser();
+    const [showChoiceModal, setShowChoiceModal] = useState(false);
+    const [showCompetitorRegistration, setShowCompetitorRegistration] = useState(false);
+    const [showHostRegistration, setShowHostRegistration] = useState(false);
+    const {user} = useUser();
 
+    const handleRegistrationClick = () => {
+        if (user) {
+            router.push(`/profile/${user.walletAddress}`);
+        } else {
+            setShowChoiceModal(true);
+        }
+    };
+
+    // In NavigationMenu.tsx, update these handlers:
+
+    const handleCompetitorRegistration = async (data: { username: string; walletAddress: string }) => {
+        try {
+            const response = await api.users.register(data);
+            toast({
+                title: "Registration Successful",
+                description: "You can now join competitions!",
+                variant: "success",
+            });
+            setShowCompetitorRegistration(false);
+            // You might want to update your user context here with the response data
+        } catch (error) {
+            toast({
+                title: "Registration Failed",
+                description: error instanceof Error ? error.message : "Please try again",
+                variant: "destructive",
+            });
+        }
+    };
+
+    const handleHostRegistration = async (data: { email: string; organization: string; contactName: string }) => {
+        try {
+            const response = await api.hosts.register(data);
+            toast({
+                title: "Host Registration Successful",
+                description: "You can now create competitions!",
+                variant: "success",
+            });
+            setShowHostRegistration(false);
+            router.push('/host/createCompetition');
+        } catch (error) {
+            toast({
+                title: "Registration Failed",
+                description: error instanceof Error ? error.message : "Please try again",
+                variant: "destructive",
+            });
+        }
+    };
 
     return (
         <div className="bg-gray-900 border-b border-gray-800">
@@ -43,58 +99,18 @@ const NavigationMenu = () => {
                         </div>
                     </div>
 
-                    {/* Profile Section */}
-                    <div className="relative">
-                        {user ? (
-                            <>
-                                <button
-                                    onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                                    className="flex items-center gap-2 text-gray-300 hover:text-white"
-                                >
-                                    <UserCircle className="h-6 w-6" />
-                                    <span className="hidden md:block">{user.username}</span>
-                                </button>
-
-                                {/* Profile Dropdown */}
-                                {profileDropdownOpen && (
-                                    <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-gray-800 ring-1 ring-black ring-opacity-5 z-50">
-                                        <Link
-                                            href={`/profile/${user.walletAddress}`}
-                                            className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700"
-                                            onClick={() => setProfileDropdownOpen(false)}
-                                        >
-                                            View Profile
-                                        </Link>
-                                        <div className="border-t border-gray-700 my-1" />
-                                        <div className="px-4 py-2">
-                                            <div className="text-sm text-gray-400">
-                                                Active Competitions
-                                            </div>
-                                            <div className="text-sm font-medium text-white">
-                                                {user.competitions?.filter(c => c.status === 'active').length || 0}
-                                            </div>
-                                        </div>
-                                        <div className="border-t border-gray-700 my-1" />
-                                        <button
-                                            onClick={() => {
-                                                localStorage.removeItem('user');
-                                                window.location.reload();
-                                            }}
-                                            className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700"
-                                        >
-                                            Log Out
-                                        </button>
-                                    </div>
-                                )}
-                            </>
-                        ) : (
-                            <Link href="/competitions" className="text-gray-300 hover:text-white">
-                                <UserCircle className="h-6 w-6" />
-                            </Link>
-                        )}
+                    {/* Registration/Profile Button */}
+                    <div className="flex-1 flex justify-end">
+                        <button
+                            onClick={handleRegistrationClick}
+                            className="px-6 py-2 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 rounded-md text-white"
+                        >
+                            {user ? 'View Profile' : 'Register'}
+                        </button>
                     </div>
-                    {/* Mobile Menu Button - right aligned */}
-                    <div className="md:hidden flex items-center">
+
+                    {/* Mobile Menu Button */}
+                    <div className="md:hidden ml-4">
                         <button
                             type="button"
                             className="p-2 text-gray-300 hover:text-white"
@@ -106,9 +122,6 @@ const NavigationMenu = () => {
                             </svg>
                         </button>
                     </div>
-
-                    {/* Empty div to maintain spacing where wallet button was */}
-                    <div className="hidden md:block flex-1"/>
                 </div>
             </div>
 
@@ -140,6 +153,32 @@ const NavigationMenu = () => {
                     </div>
                 </div>
             )}
+
+            {/* Registration Modals */}
+            <RegistrationChoiceModal
+                isOpen={showChoiceModal}
+                onClose={() => setShowChoiceModal(false)}
+                onChooseCompetitor={() => {
+                    setShowChoiceModal(false);
+                    setShowCompetitorRegistration(true);
+                }}
+                onChooseHost={() => {
+                    setShowChoiceModal(false);
+                    setShowHostRegistration(true);
+                }}
+            />
+
+            <UserRegistrationModal
+                isOpen={showCompetitorRegistration}
+                onClose={() => setShowCompetitorRegistration(false)}
+                onSubmit={handleCompetitorRegistration}
+            />
+
+            <HostRegistrationModal
+                isOpen={showHostRegistration}
+                onClose={() => setShowHostRegistration(false)}
+                onSubmit={handleHostRegistration}
+            />
         </div>
     );
 };

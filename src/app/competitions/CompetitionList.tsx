@@ -1,14 +1,15 @@
+// CompetitionList.tsx
 'use client';
-
-import React, {useState} from 'react';
-import {Card, CardContent} from "@/components/ui/card";
-import {Badge} from "@/components/ui/badge";
-import {Input} from "@/components/ui/input";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {Loader2, Play, Search, Timer, Trophy, Users, Zap} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Loader2, Play, Search, Timer, Trophy, Users, Zap } from 'lucide-react';
 import Link from 'next/link';
-import {useCompetitions} from '@/hooks/useCompetition';
-import {Alert, AlertDescription} from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { api } from '@/services/api';
+import { Competition } from '@/types';
 
 const CompetitionList = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -16,12 +17,64 @@ const CompetitionList = () => {
     const [statusFilter, setStatusFilter] = useState<string>('all');
     const [sortBy, setSortBy] = useState<string>('deadline');
 
-    const {competitions, loading, error} = useCompetitions({
-        search: searchQuery,
-        difficulty: difficultyFilter !== 'all' ? difficultyFilter : undefined,
-        status: statusFilter !== 'all' ? statusFilter : undefined,
-        sortBy,
-    });
+    const [competitions, setCompetitions] = useState<Competition[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchCompetitions = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+                const response = await api.competitions.getAll();
+                setCompetitions(response);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Failed to fetch competitions');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCompetitions();
+    }, []); // Empty dependency array means this runs once on mount
+
+    const filteredCompetitions = competitions
+        .filter(comp => {
+            // Search filter
+            if (searchQuery) {
+                const search = searchQuery.toLowerCase();
+                return comp.title.toLowerCase().includes(search) ||
+                    comp.description.toLowerCase().includes(search);
+            }
+            return true;
+        })
+        .filter(comp => {
+            // Difficulty filter
+            if (difficultyFilter !== 'all') {
+                return comp.difficulty.toLowerCase() === difficultyFilter.toLowerCase();
+            }
+            return true;
+        })
+        .filter(comp => {
+            // Status filter
+            if (statusFilter !== 'all') {
+                return comp.status.toLowerCase() === statusFilter.toLowerCase();
+            }
+            return true;
+        })
+        .sort((a, b) => {
+            // Sorting
+            switch (sortBy) {
+                case 'prize':
+                    return parseInt(b.prize) - parseInt(a.prize);
+                case 'deadline':
+                    return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+                case 'participants':
+                    return b.participants - a.participants;
+                default:
+                    return 0;
+            }
+        });
 
     return (
         <div className="min-h-screen bg-black text-white">
@@ -88,9 +141,7 @@ const CompetitionList = () => {
                 {/* Error State */}
                 {error && (
                     <Alert variant="destructive" className="mb-6 bg-red-900/20 border-red-900">
-                        <AlertDescription>
-                            Failed to load competitions. Please try again later.
-                        </AlertDescription>
+                        <AlertDescription>{error}</AlertDescription>
                     </Alert>
                 )}
 
@@ -104,7 +155,7 @@ const CompetitionList = () => {
                 {/* Competition Cards */}
                 {!loading && !error && (
                     <div className="grid grid-cols-1 gap-6">
-                        {competitions.map((competition) => (
+                        {filteredCompetitions.map((competition) => (
                             <Card
                                 key={competition.id}
                                 className="bg-gray-900 border-gray-800 hover:border-purple-500 transition-all duration-300"
@@ -118,8 +169,7 @@ const CompetitionList = () => {
                                             <p className="text-gray-400 mb-4">{competition.description}</p>
                                             <div className="flex flex-wrap gap-2 mb-4">
                                                 {competition.tags.map((tag) => (
-                                                    <Badge key={tag} variant="secondary"
-                                                           className="bg-gray-800 text-gray-300">
+                                                    <Badge key={tag} variant="secondary" className="bg-gray-800 text-gray-300">
                                                         {tag}
                                                     </Badge>
                                                 ))}
@@ -132,8 +182,7 @@ const CompetitionList = () => {
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <Users className="w-5 h-5 text-blue-400"/>
-                                                <span
-                                                    className="text-gray-400">{competition.participants} participants</span>
+                                                <span className="text-gray-400">{competition.participants} participants</span>
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <Play className="w-5 h-5 text-yellow-400"/>

@@ -32,3 +32,39 @@ export interface UserProfile {
         joinedAt: string;
     }[];
 }
+
+// types/api.ts
+export interface ApiResponse<T> {
+    message: string;
+    data?: T;
+    error?: string;
+}
+
+export interface UserResponse {
+    username: string;
+    walletAddress: string;
+    joinedAt: string;
+    competitions?: any[];
+}
+
+export interface HostResponse {
+    email: string;
+    organization: string;
+    contactName: string;
+    status: string;
+    createdAt: string;
+}
+
+export interface CompetitionResponse {
+    id: number;
+    title: string;
+    description: string;
+    prize: string;
+    participants: number;
+    start_date: string;
+    deadline: string;
+    difficulty: string;
+    status: string;
+    tags: string[];
+    rules: string[];
+}

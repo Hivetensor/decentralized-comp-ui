@@ -8,7 +8,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {Alert, AlertDescription} from "@/components/ui/alert";
 import {AlertCircle, Loader2, Plus, X} from 'lucide-react';
 import {useRouter} from 'next/navigation';
-import {api} from '@/api';
+import {api} from '@/services/api';
 import {toast} from "@/hooks/use-toast";
 
 const CreateCompetitionPage = () => {

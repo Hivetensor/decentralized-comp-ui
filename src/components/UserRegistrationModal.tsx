@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { X } from 'lucide-react';
+import React, {useState} from 'react';
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {z} from "zod";
+import { X } from 'lucide-react'; // Add this import
 
 interface UserRegistrationModalProps {
     isOpen: boolean;
@@ -12,44 +13,61 @@ interface UserRegistrationModalProps {
     onSubmit: (data: { username: string; walletAddress: string }) => void;
 }
 
-export const UserRegistrationModal = ({ isOpen, onClose, onSubmit }: UserRegistrationModalProps) => {
+const userSchema = z.object({
+    username: z.string()
+        .min(3, "Username must be at least 3 characters")
+        .max(50, "Username must be less than 50 characters"),
+    walletAddress: z.string()
+        .min(42, "Invalid wallet address length")
+        .max(42, "Invalid wallet address length")
+        .regex(/^0x[a-fA-F0-9]{40}$/, "Invalid wallet address format")
+});
+
+export const UserRegistrationModal = ({isOpen, onClose, onSubmit}: UserRegistrationModalProps) => {
     const [username, setUsername] = useState('');
     const [walletAddress, setWalletAddress] = useState('');
-    const [error, setError] = useState('');
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
-    if (!isOpen) return null;
+    if (!isOpen) return null; // Add this line to conditionally render
 
-    const generateRandomUsername = () => {
-        const adjectives = ['Happy', 'Clever', 'Swift', 'Bright', 'Noble'];
-        const nouns = ['Validator', 'Miner', 'Builder', 'Creator', 'Developer'];
-        const randomNumber = Math.floor(Math.random() * 1000);
-        const randomUsername = `${adjectives[Math.floor(Math.random() * adjectives.length)]}${nouns[Math.floor(Math.random() * nouns.length)]}${randomNumber}`;
-        setUsername(randomUsername);
+    const validateForm = () => {
+        try {
+            userSchema.parse({username, walletAddress});
+            setErrors({});
+            return true;
+        } catch (error) {
+            if (error instanceof z.ZodError) {
+                const newErrors: { [key: string]: string } = {};
+                error.errors.forEach((err) => {
+                    if (err.path) {
+                        newErrors[err.path[0]] = err.message;
+                    }
+                });
+                setErrors(newErrors);
+            }
+            return false;
+        }
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!username.trim() || !walletAddress.trim()) {
-            setError('Both username and wallet address are required');
-            return;
-        }
-        onSubmit({ username, walletAddress });
+        if (!validateForm()) return;
+        onSubmit({username, walletAddress});
     };
 
     return (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
             <div className="bg-gray-900 rounded-lg max-w-md w-full border border-gray-800">
-                {/* Header */}
+                {/* Add header with close button */}
                 <div className="flex items-center justify-between p-6 border-b border-gray-800">
                     <h2 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
-                        Join Competition
+                        Register as Competitor
                     </h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-white">
                         <X className="h-5 w-5" />
                     </button>
                 </div>
 
-                {/* Form */}
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
                     <div className="space-y-2">
                         <Label className="text-gray-300">Username</Label>
@@ -57,18 +75,15 @@ export const UserRegistrationModal = ({ isOpen, onClose, onSubmit }: UserRegistr
                             <Input
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
-                                className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                                className={`bg-gray-800 border-gray-700 text-white ${
+                                    errors.username ? 'border-red-500' : ''
+                                }`}
                                 placeholder="Choose a username"
                             />
-                            <Button
-                                type="button"
-                                variant="secondary"
-                                onClick={generateRandomUsername}
-                                className="bg-gray-800 text-gray-300 hover:bg-gray-700"
-                            >
-                                Random
-                            </Button>
                         </div>
+                        {errors.username && (
+                            <p className="text-red-400 text-sm mt-1">{errors.username}</p>
+                        )}
                     </div>
 
                     <div className="space-y-2">
@@ -76,14 +91,15 @@ export const UserRegistrationModal = ({ isOpen, onClose, onSubmit }: UserRegistr
                         <Input
                             value={walletAddress}
                             onChange={(e) => setWalletAddress(e.target.value)}
-                            className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                            className={`bg-gray-800 border-gray-700 text-white ${
+                                errors.walletAddress ? 'border-red-500' : ''
+                            }`}
                             placeholder="Enter your wallet address"
                         />
+                        {errors.walletAddress && (
+                            <p className="text-red-400 text-sm mt-1">{errors.walletAddress}</p>
+                        )}
                     </div>
-
-                    {error && (
-                        <p className="text-red-400 text-sm">{error}</p>
-                    )}
 
                     <Button
                         type="submit"

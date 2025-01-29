@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Host {
+  id           Int           @id @default(autoincrement())
+  email        String        @unique
+  organization String?
+  contactName  String?       @map("contact_name")
+  status       String        @default("pending")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  competitions Competition[]
+
+  @@map("hosts")
+}
+
+model Competition {
+  id                 Int                      @id @default(autoincrement())
+  hostId             Int                      @map("host_id")
+  title              String
+  description        String // Changed from Text
+  prize              String
+  participants       Int                      @default(0)
+  startDate          DateTime                 @map("start_date")
+  deadline           DateTime
+  difficulty         String
+  status             String
+  datasetUrl         String?                  @map("dataset_url")
+  datasetDescription String?                  @map("dataset_description") // Changed from Text
+  evaluationMetric   String?                  @map("evaluation_metric")
+  submissionFormat   String?                  @map("submission_format") // Changed from Text
+  createdAt          DateTime                 @default(now()) @map("created_at")
+  host               Host                     @relation(fields: [hostId], references: [id])
+  tags               CompetitionTag[]
+  rules              CompetitionRule[]
+  participantEntries CompetitionParticipant[]
+  dataset            Dataset?
+
+  @@map("competitions")
+}
+
+model CompetitionTag {
+  competitionId Int         @map("competition_id")
+  tag           String
+  competition   Competition @relation(fields: [competitionId], references: [id])
+
+  @@id([competitionId, tag])
+  @@map("competition_tags")
+}
+
+model CompetitionRule {
+  competitionId Int         @map("competition_id")
+  rule          String
+  competition   Competition @relation(fields: [competitionId], references: [id])
+
+  @@id([competitionId, rule])
+  @@map("competition_rules")
+}
+
+model User {
+  walletAddress String                   @id @map("wallet_address")
+  username      String                   @unique
+  joinedAt      DateTime                 @default(now()) @map("joined_at")
+  competitions  CompetitionParticipant[]
+
+  @@map("users")
+}
+
+model CompetitionParticipant {
+  competitionId Int         @map("competition_id")
+  walletAddress String      @map("wallet_address")
+  joinedAt      DateTime    @default(now()) @map("joined_at")
+  competition   Competition @relation(fields: [competitionId], references: [id])
+  user          User        @relation(fields: [walletAddress], references: [walletAddress])
+
+  @@id([competitionId, walletAddress])
+  @@map("competition_participants")
+}
+
+model Dataset {
+  id            Int         @id @default(autoincrement())
+  competitionId Int         @unique @map("competition_id")
+  fileName      String      @map("file_name")
+  fileSize      Int         @map("file_size")
+  fileType      String      @map("file_type")
+  uploadedAt    DateTime    @default(now()) @map("uploaded_at")
+  storageUrl    String      @map("storage_url")
+  competition   Competition @relation(fields: [competitionId], references: [id])
+
+  @@map("datasets")
+}

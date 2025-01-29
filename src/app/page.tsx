@@ -1,9 +1,34 @@
-import React from 'react';
-import Link from 'next/link'; // Add this import at the top
-import {Button} from '@/components/ui/button';
+'use client';
 
+import React from 'react';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@/contexts/UserContext';
+import { Button } from '@/components/ui/button';
 
 const HomePage = () => {
+    const router = useRouter();
+    const { user } = useUser();
+
+    const handleJoinClick = () => {
+        if (user) {
+            router.push('/competitions');
+        } else {
+            router.push('/competitions');
+            // The registration flow will be handled in the competitions page
+            // when they try to join a specific competition
+        }
+    };
+
+    const handleHostClick = () => {
+        if (user) {
+            router.push('/host/dashboard');
+        } else {
+            router.push('/competitions');
+            // The registration flow will be handled by the NavigationMenu
+            // when they click the Register button
+        }
+    };
+
     return (
         <div className="bg-black text-white flex flex-col min-h-screen">
             {/* Hero Section */}
@@ -18,16 +43,18 @@ const HomePage = () => {
                             </h1>
 
                             <div className="flex flex-col md:flex-row gap-4 mb-8 md:mb-12">
-                                <Link href="/competitions">
-                                    <button className="w-full md:w-auto px-6 md:px-10 py-4 md:py-8 text-base md:text-lg bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 rounded-md">
-                                        Join a Competition
-                                    </button>
-                                </Link>
-                                <Link href="/host">
-                                    <button className="w-full md:w-auto px-6 md:px-10 py-4 md:py-8 text-base md:text-lg bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 rounded-md">
-                                        Host a Competition
-                                    </button>
-                                </Link>
+                                <Button
+                                    onClick={handleJoinClick}
+                                    className="w-full md:w-auto px-6 md:px-10 py-4 md:py-8 text-base md:text-lg bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 rounded-md"
+                                >
+                                    Join a Competition
+                                </Button>
+                                <Button
+                                    onClick={handleHostClick}
+                                    className="w-full md:w-auto px-6 md:px-10 py-4 md:py-8 text-base md:text-lg bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 rounded-md"
+                                >
+                                    Host a Competition
+                                </Button>
                             </div>
                         </div>
 
