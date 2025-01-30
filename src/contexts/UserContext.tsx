@@ -9,8 +9,7 @@ interface User {
     competitions: {
         id: number;
         title: string;
-        rank?: number;
-        status: 'active' | 'completed';
+        status: 'active' | 'completed';  // This is the strict type
         joinedAt: string;
     }[];
 }
@@ -48,7 +47,7 @@ export function UserProvider({children}: { children: React.ReactNode }) {
     const joinCompetition = (competitionId: number, competitionTitle: string = '') => {
         if (!user) return;
 
-        const updatedUser = {
+        const updatedUser: User = {
             ...user,
             competitions: [
                 ...user.competitions,
