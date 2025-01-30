@@ -69,6 +69,25 @@ const NavigationMenu = () => {
         }
     };
 
+    const getHostEmail = () => {
+        const hostKey = Object.keys(localStorage).find(key => key.startsWith('host_'));
+        if (hostKey) {
+            const hostData = JSON.parse(localStorage.getItem(hostKey) || '{}');
+            return hostData.email;
+        }
+        return null;
+    };
+
+    const handleProfileClick = () => {
+        const hostEmail = getHostEmail();
+        if (user) {
+            router.push(`/profile/${user.walletAddress}`);
+        } else if (hostEmail) {
+            router.push(`/host/profile/${hostEmail}`);
+        } else {
+            setShowChoiceModal(true);
+        }
+    };
     return (
         <div className="bg-gray-900 border-b border-gray-800">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -91,20 +110,24 @@ const NavigationMenu = () => {
                             <Link href="/datasets"
                                   className="text-gray-300 hover:text-white transition-colors text-base font-medium">
                                 Datasets
-                            </Link>
+                            </Link>{/*
                             <Link href="/leaderboard"
                                   className="text-gray-300 hover:text-white transition-colors text-base font-medium">
                                 Leaderboard
+                            </Link>*/}
+                            <Link href="/about"
+                                  className="text-gray-300 hover:text-white transition-colors text-base font-medium">
+                                About
                             </Link>
                         </div>
                     </div>
 
                     <div className="flex-1 flex justify-end">
                         <button
-                            onClick={handleRegistrationClick}
+                            onClick={handleProfileClick}
                             className="px-6 py-2 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 rounded-md text-white"
                         >
-                            {user ? 'My Profile' : 'Register'}
+                            {user ? 'My Profile' : (getHostEmail() ? 'Host Dashboard' : 'Register')}
                         </button>
                     </div>
 

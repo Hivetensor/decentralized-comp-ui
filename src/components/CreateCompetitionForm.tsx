@@ -11,6 +11,8 @@ import {Alert, AlertDescription} from "@/components/ui/alert";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 import {Calendar, Clock, FileText, Target, Trophy} from 'lucide-react';
 import {z} from "zod";
+import {api} from '@/services/api';
+import {toast} from "@/hooks/use-toast";
 
 const competitionSchema = z.object({
     title: z.string()
@@ -90,21 +92,14 @@ const CreateCompetitionForm = () => {
             const hostEmail = Object.keys(localStorage).find(key => key.startsWith('host_'));
             if (!hostEmail) throw new Error('Host not found');
 
-            // Get existing competitions or create new array
-            const existingCompetitions = JSON.parse(localStorage.getItem(`competitions_${hostEmail}`) || '[]');
+            const hostData = JSON.parse(localStorage.getItem(hostEmail) || '{}');
+            await api.hosts.createCompetition(hostData.id, formData);
 
-            const newCompetition = {
-                id: Date.now(),
-                ...formData,
-                createdAt: new Date().toISOString(),
-                status: 'pending',
-                participants: 0
-            };
-
-            localStorage.setItem(
-                `competitions_${hostEmail}`,
-                JSON.stringify([...existingCompetitions, newCompetition])
-            );
+            toast({
+                title: "Competition Created",
+                description: "Your competition has been created successfully",
+                variant: "success",
+            })
 
             router.push('/host/dashboard');
         } catch (err) {

@@ -4,6 +4,7 @@ import "./globals.css";
 import NavigationMenu from '@/components/NavigationMenu';
 import Footer from '@/components/Footer';
 import {UserProvider} from '@/contexts/UserContext';
+import {Toaster} from '@/components/ui/toaster';
 
 
 const geistSans = localFont({
@@ -31,6 +32,7 @@ export default function RootLayout({
             <NavigationMenu/>
             {children}
             <Footer/>
+            <Toaster/>
         </UserProvider>
         </body>
         </html>

@@ -2,7 +2,7 @@ import {Competition, LeaderboardEntry} from '@/types';
 import {mockCompetitions, mockLeaderboard} from '@/mock/competitions';
 
 // Flag to switch between mock and real API
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 export const competitionService = {
     getCompetitions: async (params?: {

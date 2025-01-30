@@ -37,7 +37,13 @@ export const api = {
             const response = await fetch(`${API_CONFIG.BASE_URL}/hosts/register`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
+                body: JSON.stringify(
+                    {
+                        email: data.email,
+                        organization: data.organization,
+                        contact_name: data.contactName
+                    }
+                )
             });
             if (!response.ok) {
                 const error = await response.json();
@@ -55,6 +61,15 @@ export const api = {
             if (!response.ok) {
                 const error = await response.json();
                 throw new Error(error.detail || 'Failed to create competition');
+            }
+            return response.json();
+        },
+
+        getProfile: async (email: string) => {
+            const response = await fetch(`${API_CONFIG.BASE_URL}/hosts/${email}`);
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.detail || 'Failed to fetch host profile');
             }
             return response.json();
         }
