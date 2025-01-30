@@ -19,7 +19,7 @@ import {Competition, LeaderboardEntry} from '@/types';
 const CompetitionDetail = () => {
     const params = useParams();
     const competitionId = Number(params.id);
-    const {user, isInCompetition} = useUser();
+    const {user, isInCompetition, joinCompetition} = useUser();
 
     const [competition, setCompetition] = useState<Competition | null>(null);
     const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -56,6 +56,7 @@ const CompetitionDetail = () => {
 
         try {
             await api.users.registerForCompetition(user.walletAddress, competitionId);
+            joinCompetition(competitionId, competition?.title || '');
             toast({
                 title: "Success",
                 description: "You've successfully joined the competition!",

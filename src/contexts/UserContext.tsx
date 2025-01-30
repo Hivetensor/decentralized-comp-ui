@@ -18,7 +18,7 @@ interface User {
 interface UserContextType {
     user: User | null;
     registerUser: (username: string, walletAddress: string) => void;
-    joinCompetition: (competitionId: number) => void;
+    joinCompetition: (competitionId: number, competitionTitle: String) => void;
     isInCompetition: (competitionId: number) => boolean;
 }
 

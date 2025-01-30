@@ -10,6 +10,22 @@ interface LeaderboardComponentProps {
 }
 
 const LeaderboardComponent = ({leaderboardData}: LeaderboardComponentProps) => {
+    if (!leaderboardData?.length) {
+        return (
+            <Card className="bg-gray-900 border-gray-800">
+                <CardHeader>
+                    <CardTitle className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
+                        Leaderboard
+                    </CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="text-center py-8 text-gray-400">
+                        No participants yet. Be the first to join!
+                    </div>
+                </CardContent>
+            </Card>
+        );
+    }
     const colors = [
         '#ff0099', '#00ff99', '#9900ff', '#ff9900', '#00ffff',
         '#ff00ff', '#99ff00', '#0099ff', '#ffff00', '#ff0000'
