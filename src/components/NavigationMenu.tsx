@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import Link from 'next/link';
 import {useRouter} from 'next/navigation';
 import {useUser} from '@/contexts/UserContext';
@@ -17,7 +17,11 @@ const NavigationMenu = () => {
     const [showCompetitorRegistration, setShowCompetitorRegistration] = useState(false);
     const [showHostRegistration, setShowHostRegistration] = useState(false);
     const {user, registerUser} = useUser();
+    const [hostEmail, setHostEmail] = useState<string | null>(null);
 
+    useEffect(() => {
+        setHostEmail(getHostEmail());
+    }, []);
     const handleCompetitorRegistration = async (data: { username: string; walletAddress: string }) => {
         try {
             const response = await api.users.register(data);
@@ -62,6 +66,8 @@ const NavigationMenu = () => {
     };
 
     const getHostEmail = () => {
+        if (typeof window === 'undefined') return null; // Check if we're in browser
+
         const hostKey = Object.keys(localStorage).find(key => key.startsWith('host_'));
         if (hostKey) {
             const hostData = JSON.parse(localStorage.getItem(hostKey) || '{}');
