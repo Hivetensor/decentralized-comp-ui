@@ -6,7 +6,12 @@ export const api = {
             const response = await fetch(`${API_CONFIG.BASE_URL}/users/register`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
+                body: JSON.stringify(
+                    {
+                        username: data.username,
+                        wallet_address: data.walletAddress
+                    }
+                )
             });
             if (!response.ok) {
                 const error = await response.json();
@@ -57,7 +62,7 @@ export const api = {
 
     competitions: {
         getAll: async () => {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/competitions`);
+            const response = await fetch(`${API_CONFIG.BASE_URL}/competitions/competitions`);
             if (!response.ok) {
                 const error = await response.json();
                 throw new Error(error.detail || 'Failed to fetch competitions');
@@ -70,6 +75,15 @@ export const api = {
             if (!response.ok) {
                 const error = await response.json();
                 throw new Error(error.detail || 'Failed to fetch competition');
+            }
+            return response.json();
+        },
+
+        getLeaderboard: async (competitionId: number) => {
+            const response = await fetch(`${API_CONFIG.BASE_URL}/competitions/${competitionId}/leaderboard`);
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.detail || 'Failed to fetch leaderboard');
             }
             return response.json();
         }

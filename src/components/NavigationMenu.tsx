@@ -1,4 +1,3 @@
-// components/NavigationMenu.tsx
 'use client';
 
 import React, {useState} from 'react';
@@ -17,7 +16,7 @@ const NavigationMenu = () => {
     const [showChoiceModal, setShowChoiceModal] = useState(false);
     const [showCompetitorRegistration, setShowCompetitorRegistration] = useState(false);
     const [showHostRegistration, setShowHostRegistration] = useState(false);
-    const {user} = useUser();
+    const {user, registerUser} = useUser();
 
     const handleRegistrationClick = () => {
         if (user) {
@@ -27,18 +26,21 @@ const NavigationMenu = () => {
         }
     };
 
-    // In NavigationMenu.tsx, update these handlers:
-
     const handleCompetitorRegistration = async (data: { username: string; walletAddress: string }) => {
         try {
             const response = await api.users.register(data);
+
+            registerUser(data.username, data.walletAddress);
+
             toast({
                 title: "Registration Successful",
-                description: "You can now join competitions!",
+                description: "Welcome to HiveTensor!",
                 variant: "success",
             });
+
             setShowCompetitorRegistration(false);
-            // You might want to update your user context here with the response data
+            router.push(`/profile/${data.walletAddress}`);
+
         } catch (error) {
             toast({
                 title: "Registration Failed",
@@ -71,7 +73,6 @@ const NavigationMenu = () => {
         <div className="bg-gray-900 border-b border-gray-800">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between h-24">
-                    {/* Logo - stays left on desktop, centers on mobile */}
                     <div className="flex-1 flex items-center justify-center md:justify-start">
                         <Link href="/" className="flex items-center">
                             <span
@@ -81,7 +82,6 @@ const NavigationMenu = () => {
                         </Link>
                     </div>
 
-                    {/* Desktop Navigation - centered */}
                     <div className="hidden md:flex items-center justify-center flex-1">
                         <div className="flex space-x-8">
                             <Link href="/competitions"
@@ -99,17 +99,15 @@ const NavigationMenu = () => {
                         </div>
                     </div>
 
-                    {/* Registration/Profile Button */}
                     <div className="flex-1 flex justify-end">
                         <button
                             onClick={handleRegistrationClick}
                             className="px-6 py-2 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 rounded-md text-white"
                         >
-                            {user ? 'View Profile' : 'Register'}
+                            {user ? 'My Profile' : 'Register'}
                         </button>
                     </div>
 
-                    {/* Mobile Menu Button */}
                     <div className="md:hidden ml-4">
                         <button
                             type="button"
@@ -125,7 +123,6 @@ const NavigationMenu = () => {
                 </div>
             </div>
 
-            {/* Mobile Menu Panel */}
             {mobileMenuOpen && (
                 <div className="md:hidden absolute w-full bg-gray-900 border-b border-gray-800 shadow-lg z-50">
                     <div className="px-4 py-3 space-y-3">
@@ -154,7 +151,6 @@ const NavigationMenu = () => {
                 </div>
             )}
 
-            {/* Registration Modals */}
             <RegistrationChoiceModal
                 isOpen={showChoiceModal}
                 onClose={() => setShowChoiceModal(false)}

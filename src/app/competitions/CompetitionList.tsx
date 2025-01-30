@@ -163,7 +163,7 @@ const CompetitionList = () => {
                                 <CardContent className="p-6">
                                     <div className="flex flex-col md:flex-row justify-between">
                                         <div className="flex-1">
-                                            <Link href={`/competitions/${competition.id}`}>
+                                            <Link href={`/competitions//${competition.id}`}>
                                                 <h3 className="text-2xl font-bold mb-2 text-white">{competition.title}</h3>
                                             </Link>
                                             <p className="text-gray-400 mb-4">{competition.description}</p>
