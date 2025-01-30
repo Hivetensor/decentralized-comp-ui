@@ -2,5 +2,5 @@
 import ComingSoon from '@/components/ComingSoon';
 
 export default function LeaderBoardPage() {
-    return <ComingSoon />;
+    return <ComingSoon/>;
 }

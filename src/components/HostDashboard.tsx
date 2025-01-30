@@ -108,7 +108,7 @@ const HostDashboard = () => {
                             {competitions.length === 0 ? (
                                 <div className="text-center py-8">
                                     <p className="text-gray-400">No competitions created yet</p>
-                                    <Link href="/host/create-competition">
+                                    <Link href="/host/createCompetition">
                                         <Button variant="link" className="text-purple-400 mt-2">
                                             Create your first competition
                                         </Button>

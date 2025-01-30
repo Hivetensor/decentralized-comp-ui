@@ -18,14 +18,6 @@ const NavigationMenu = () => {
     const [showHostRegistration, setShowHostRegistration] = useState(false);
     const {user, registerUser} = useUser();
 
-    const handleRegistrationClick = () => {
-        if (user) {
-            router.push(`/profile/${user.walletAddress}`);
-        } else {
-            setShowChoiceModal(true);
-        }
-    };
-
     const handleCompetitorRegistration = async (data: { username: string; walletAddress: string }) => {
         try {
             const response = await api.users.register(data);
@@ -107,14 +99,14 @@ const NavigationMenu = () => {
                                   className="text-gray-300 hover:text-white transition-colors text-base font-medium">
                                 Competitions
                             </Link>
-                            <Link href="/datasets"
-                                  className="text-gray-300 hover:text-white transition-colors text-base font-medium">
+                            {<Link href="/datasets"
+                                   className="text-gray-300 hover:text-white transition-colors text-base font-medium">
                                 Datasets
-                            </Link>{/*
+                            </Link>}{
                             <Link href="/leaderboard"
                                   className="text-gray-300 hover:text-white transition-colors text-base font-medium">
                                 Leaderboard
-                            </Link>*/}
+                            </Link>}
                             <Link href="/about"
                                   className="text-gray-300 hover:text-white transition-colors text-base font-medium">
                                 About
@@ -157,11 +149,11 @@ const NavigationMenu = () => {
                             Competitions
                         </Link>
                         <Link
-                            href="/datasets"
+                            href="/about"
                             className="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
                             onClick={() => setMobileMenuOpen(false)}
                         >
-                            Datasets
+                            About Us
                         </Link>
                         <Link
                             href="/leaderboard"

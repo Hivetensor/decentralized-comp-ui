@@ -20,7 +20,7 @@ const userSchema = z.object({
     walletAddress: z.string()
         .min(20, "Invalid wallet address length")
         .max(62, "Invalid wallet address length")
-        // .regex(/^5[a-zA-Z0-9]{47}$/, "Invalid Bittensor wallet address format")
+    // .regex(/^5[a-zA-Z0-9]{47}$/, "Invalid Bittensor wallet address format")
 });
 
 export const UserRegistrationModal = ({isOpen, onClose, onSubmit}: UserRegistrationModalProps) => {

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import {Github, Linkedin, Twitter, Youtube} from 'lucide-react';
+import {Github, Linkedin, Youtube} from 'lucide-react';
 
 const Footer = () => {
     return (
@@ -66,9 +66,9 @@ const Footer = () => {
                         <h3 className="text-lg font-semibold mb-4 text-white">Contacts</h3>
                         <div className="space-y-4">
                             <div className="flex space-x-4">
-                                <a href="#" className="hover:text-white">
-                                    <Twitter className="h-5 w-5"/>
-                                </a>
+                                {/*<a href="#" className="hover:text-white">*/}
+                                {/*    <X className="h-5 w-5"/>*/}
+                                {/*</a>*/}
                                 <a href="#" className="hover:text-white">
                                     <Linkedin className="h-5 w-5"/>
                                 </a>

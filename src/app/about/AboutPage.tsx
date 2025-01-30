@@ -10,7 +10,7 @@ const AboutPage = () => {
     const teamMembers = [
         {
             name: "Dr. Kofi Osei-Obonsu",
-            role: "ASI Prophet",
+            role: "AI Researcher",
             bio: ".",
             image: "/api/placeholder/150/150",
             links: {
@@ -21,7 +21,7 @@ const AboutPage = () => {
         },
         {
             name: "Ali Hussein",
-            role: "ASI Summoner",
+            role: "ML Engineer",
             bio: ".",
             image: "/api/placeholder/150/150",
             links: {
