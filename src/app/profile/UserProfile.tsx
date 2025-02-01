@@ -1,161 +1,149 @@
 'use client';
 
 import React from 'react';
-import { useParams } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Trophy, Star, Award, GitBranch, Clock, Users } from 'lucide-react';
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2 } from 'lucide-react';
-import { useProfile } from '@/hooks/useProfile';
+import {useParams} from 'next/navigation';
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Badge} from "@/components/ui/badge";
+import {Clock, Trophy} from 'lucide-react';
+import {Alert, AlertDescription} from "@/components/ui/alert";
+import {useUser} from '@/contexts/UserContext';
+import Link from 'next/link';
 
 const UserProfile = () => {
-  const params = useParams();
-  const username = String(params.username);
-  const { profile, loading, error } = useProfile(username);
+    const params = useParams();
+    const {user} = useUser();
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-purple-500" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-black text-white p-8">
-        <Alert variant="destructive" className="bg-red-900/20 border-red-900">
-          <AlertDescription>
-            Failed to load user profile. Please try again later.
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
-
-  if (!profile) {
-    return null;
-  }
-
-  return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-purple-900/50 to-cyan-900/50 p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-6">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-r from-purple-500 to-cyan-500 flex items-center justify-center text-3xl font-bold">
-              {profile.username[0].toUpperCase()}
+    if (!user || user.walletAddress !== params.walletAddress) {
+        return (
+            <div className="min-h-screen bg-black text-white p-8">
+                <Alert variant="destructive" className="bg-red-900/20 border-red-900">
+                    <AlertDescription>
+                        Profile not found or you don't have access to view it.
+                    </AlertDescription>
+                </Alert>
             </div>
-            <div>
-              <h1 className="text-4xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
-                {profile.username}
-              </h1>
-              <div className="flex items-center gap-4 text-gray-300">
-                <code className="bg-gray-800 px-3 py-1 rounded">{profile.publicKey}</code>
-                <span>Member since {new Date(profile.joinDate).toLocaleDateString()}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+        );
+    }
 
-      <div className="max-w-7xl mx-auto p-6 space-y-6">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card className="bg-gray-900 border-gray-800">
-            <CardContent className="p-4 flex items-center gap-3">
-              <Trophy className="w-8 h-8 text-yellow-500" />
-              <div>
-                <p className="text-sm text-gray-400">Competitions</p>
-                <p className="text-2xl font-bold text-yellow-500">{profile.stats.totalCompetitions}</p>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-gray-900 border-gray-800">
-            <CardContent className="p-4 flex items-center gap-3">
-              <Star className="w-8 h-8 text-purple-500" />
-              <div>
-                <p className="text-sm text-gray-400">Best Rank</p>
-                <p className="text-2xl font-bold text-purple-500">#{profile.stats.bestRank}</p>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-gray-900 border-gray-800">
-            <CardContent className="p-4 flex items-center gap-3">
-              <GitBranch className="w-8 h-8 text-cyan-500" />
-              <div>
-                <p className="text-sm text-gray-400">Submissions</p>
-                <p className="text-2xl font-bold text-cyan-500">{profile.stats.totalSubmissions}</p>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-gray-900 border-gray-800">
-            <CardContent className="p-4 flex items-center gap-3">
-              <Award className="w-8 h-8 text-green-500" />
-              <div>
-                <p className="text-sm text-gray-400">Avg Score</p>
-                <p className="text-2xl font-bold text-green-500">{profile.stats.averageScore}</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Recent Competitions */}
-        <Card className="bg-gray-900 border-gray-800">
-          <CardHeader>
-            <CardTitle className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
-              Recent Competitions
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {profile.recentCompetitions.map((competition) => (
-                <div 
-                  key={competition.id}
-                  className="p-4 bg-gray-800/50 rounded-lg border border-gray-700 hover:border-purple-500 transition-all duration-300"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <Badge variant="outline" className="bg-purple-900/20">
-                        #{competition.rank}
-                      </Badge>
-                      <div>
-                        <h3 className="text-lg font-semibold text-white">
-                          {competition.name}
-                        </h3>
-                        <div className="flex items-center gap-4 mt-1 text-sm text-gray-400">
-                          <div className="flex items-center gap-1">
-                            <Users className="w-4 h-4" />
-                            {competition.totalParticipants} participants
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
-                            {new Date(competition.date).toLocaleDateString()}
-                          </div>
+    return (
+        <div className="min-h-screen bg-black text-white">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-purple-900/50 to-cyan-900/50 p-8">
+                <div className="max-w-7xl mx-auto">
+                    <div className="flex items-center gap-6">
+                        <div
+                            className="w-24 h-24 rounded-full bg-gradient-to-r from-purple-500 to-cyan-500 flex items-center justify-center text-3xl font-bold">
+                            {user.username[0].toUpperCase()}
                         </div>
-                      </div>
+                        <div>
+                            <h1 className="text-4xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
+                                {user.username}
+                            </h1>
+                            <div className="flex items-center gap-4 text-gray-300">
+                                <code className="bg-gray-800 px-3 py-1 rounded">{user.walletAddress}</code>
+                                <span>Member since {new Date(user.joinedAt).toLocaleDateString()}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-xl font-bold text-cyan-400">
-                        {competition.score.toFixed(3)}
-                      </div>
-                      <div className="text-sm text-gray-400">
-                        Score
-                      </div>
-                    </div>
-                  </div>
                 </div>
-              ))}
             </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
+
+            <div className="max-w-7xl mx-auto p-6 space-y-6">
+                {/* Stats */}
+                <Card className="bg-gray-900 border-gray-800">
+                    <CardHeader>
+                        <CardTitle
+                            className="text-xl text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
+                            Competition Stats
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="flex items-center gap-3">
+                                <Trophy className="w-8 h-8 text-yellow-500"/>
+                                <div>
+                                    <p className="text-sm text-gray-400">Total Competitions</p>
+                                    <p className="text-2xl font-bold text-yellow-500">{user.competitions.length}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <Badge
+                                    className="h-8 w-8 flex items-center justify-center text-purple-500 bg-purple-900/20">
+                                    #
+                                </Badge>
+                                <div>
+                                    <p className="text-sm text-gray-400">Active Competitions</p>
+                                    <p className="text-2xl font-bold text-purple-500">
+                                        {user.competitions.filter(c => c.status === 'active').length}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Competitions List */}
+                <Card className="bg-gray-900 border-gray-800">
+                    <CardHeader>
+                        <CardTitle
+                            className="text-xl text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
+                            Your Competitions
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        {user.competitions.length === 0 ? (
+                            <div className="text-center py-8 text-gray-400">
+                                You haven't joined any competitions yet.
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {user.competitions.map((competition) => (
+                                    <Link
+                                        key={competition.id}
+                                        href={`/competitions/${competition.id}`}
+                                        className="block"
+                                    >
+                                        <div
+                                            className="p-4 bg-gray-800/50 rounded-lg border border-gray-700 hover:border-purple-500/50 transition-all duration-300">
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <h3 className="text-lg font-semibold text-gray-200">
+                                                        {competition.title}
+                                                    </h3>
+                                                    <div className="flex items-center gap-4 mt-2">
+                                                        <Badge className={competition.status === 'active'
+                                                            ? 'bg-green-900/20 text-green-400 border-green-500/20'
+                                                            : 'bg-gray-800 text-gray-300'
+                                                        }>
+                                                            {competition.status}
+                                                        </Badge>
+                                                        <div className="flex items-center gap-1 text-gray-400">
+                                                            <Clock className="w-4 h-4"/>
+                                                            Joined {new Date(competition.joinedAt).toLocaleDateString()}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {/*{competition.rank && (*/}
+                                                {/*    <div className="text-right">*/}
+                                                {/*        <div className="text-xl font-bold text-purple-400">*/}
+                                                {/*            #{competition.rank}*/}
+                                                {/*        </div>*/}
+                                                {/*        <div className="text-sm text-gray-400">*/}
+                                                {/*            Current Rank*/}
+                                                {/*        </div>*/}
+                                                {/*    </div>*/}
+                                                {/*)}*/}
+                                            </div>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
+    );
 };
 
 export default UserProfile;
