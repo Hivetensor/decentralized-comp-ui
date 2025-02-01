@@ -4,7 +4,7 @@ import React from 'react';
 import {useParams} from 'next/navigation';
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Badge} from "@/components/ui/badge";
-import {Award, GitBranch, Star, Trophy} from 'lucide-react';
+import {Award, GitBranch, Trophy} from 'lucide-react';
 import Link from 'next/link';
 import {useUser} from '@/contexts/UserContext';
 
@@ -28,8 +28,8 @@ const UserProfilePage = () => {
     // Calculate stats
     const activeCompetitions = user.competitions.filter(c => c.status === 'active').length;
     const completedCompetitions = user.competitions.filter(c => c.status === 'completed').length;
-    const bestRank = user.competitions.reduce((best, curr) =>
-        curr.rank ? Math.min(best, curr.rank) : best, Infinity);
+    // const bestRank = user.competitions.reduce((best, curr) =>
+    //     curr.rank ? Math.min(best, curr.rank) : best, Infinity);
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
@@ -69,17 +69,17 @@ const UserProfilePage = () => {
                         </CardContent>
                     </Card>
 
-                    <Card className="bg-gray-800/50 border-gray-700">
-                        <CardContent className="p-6 flex items-center gap-4">
-                            <Star className="h-8 w-8 text-purple-500"/>
-                            <div>
-                                <p className="text-sm text-gray-400">Best Rank</p>
-                                <p className="text-2xl font-bold text-purple-400">
-                                    {bestRank === Infinity ? '-' : `#${bestRank}`}
-                                </p>
-                            </div>
-                        </CardContent>
-                    </Card>
+                    {/*<Card className="bg-gray-800/50 border-gray-700">*/}
+                    {/*    <CardContent className="p-6 flex items-center gap-4">*/}
+                    {/*        <Star className="h-8 w-8 text-purple-500"/>*/}
+                    {/*        <div>*/}
+                    {/*            <p className="text-sm text-gray-400">Best Rank</p>*/}
+                    {/*            <p className="text-2xl font-bold text-purple-400">*/}
+                    {/*                {bestRank === Infinity ? '-' : `#${bestRank}`}*/}
+                    {/*            </p>*/}
+                    {/*        </div>*/}
+                    {/*    </CardContent>*/}
+                    {/*</Card>*/}
 
                     <Card className="bg-gray-800/50 border-gray-700">
                         <CardContent className="p-6 flex items-center gap-4">
@@ -140,7 +140,7 @@ const UserProfilePage = () => {
                                                     </span>
                                                 </div>
                                             </div>
-                                            {competition.rank && (
+                                            {/*                                           {competition.rank && (
                                                 <div className="text-right">
                                                     <div className="text-xl font-bold text-purple-400">
                                                         #{competition.rank}
@@ -149,7 +149,7 @@ const UserProfilePage = () => {
                                                         Current Rank
                                                     </div>
                                                 </div>
-                                            )}
+                                            )}*/}
                                         </div>
                                     </div>
                                 </Link>

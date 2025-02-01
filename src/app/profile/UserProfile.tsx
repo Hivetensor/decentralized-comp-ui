@@ -123,16 +123,16 @@ const UserProfile = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                {competition.rank && (
-                                                    <div className="text-right">
-                                                        <div className="text-xl font-bold text-purple-400">
-                                                            #{competition.rank}
-                                                        </div>
-                                                        <div className="text-sm text-gray-400">
-                                                            Current Rank
-                                                        </div>
-                                                    </div>
-                                                )}
+                                                {/*{competition.rank && (*/}
+                                                {/*    <div className="text-right">*/}
+                                                {/*        <div className="text-xl font-bold text-purple-400">*/}
+                                                {/*            #{competition.rank}*/}
+                                                {/*        </div>*/}
+                                                {/*        <div className="text-sm text-gray-400">*/}
+                                                {/*            Current Rank*/}
+                                                {/*        </div>*/}
+                                                {/*    </div>*/}
+                                                {/*)}*/}
                                             </div>
                                         </div>
                                     </Link>
