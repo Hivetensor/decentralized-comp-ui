@@ -15,7 +15,7 @@ const geistSans = localFont({
 
 
 export const metadata: Metadata = {
-    title: "HiveTensor",
+    title: "Home | HiveTensor",
     description: "HiveTensor website",
 };
 
@@ -27,6 +27,9 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en" className={geistSans.className}>
+        <head>
+            <link rel="icon" href="/favicon.ico"/>
+        </head>
         <body>
         <UserProvider>
             <NavigationMenu/>
