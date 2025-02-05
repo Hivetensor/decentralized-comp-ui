@@ -29,7 +29,36 @@ export const api = {
                 throw new Error(error.detail || 'Competition registration failed');
             }
             return response.json();
-        }
+        },
+
+        login: async (data: { username: string; walletAddress: string }) => {
+            const response = await fetch(`${API_CONFIG.BASE_URL}/users/login`, {
+                method: 'POST',
+                credentials: 'include', // Important for cookies
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+            if (!response.ok) throw new Error('Login failed');
+            return response.json();
+        },
+
+        getProfile: async () => {
+            const response = await fetch(`${API_CONFIG.BASE_URL}/users/profile`, {
+                credentials: 'include',
+            });
+            if (!response.ok) throw new Error('Failed to get profile');
+            return response.json();
+        },
+
+        logout: async () => {
+            const response = await fetch(`${API_CONFIG.BASE_URL}/users/logout`, {
+                method: 'POST',
+                credentials: 'include',
+            });
+            if (!response.ok) throw new Error('Logout failed');
+            return response.json();
+        },
+
     },
 
     hosts: {

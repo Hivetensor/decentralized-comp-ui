@@ -5,6 +5,7 @@ import NavigationMenu from '@/components/NavigationMenu';
 import Footer from '@/components/Footer';
 import {UserProvider} from '@/contexts/UserContext';
 import {Toaster} from '@/components/ui/toaster';
+import {AuthProvider} from "@/contexts/AuthContext";
 
 
 const geistSans = localFont({
@@ -31,12 +32,14 @@ export default function RootLayout({
             <link rel="icon" href="/favicon.ico"/>
         </head>
         <body>
+        <AuthProvider>
         <UserProvider>
             <NavigationMenu/>
             {children}
             <Footer/>
             <Toaster/>
         </UserProvider>
+        </AuthProvider>
         </body>
         </html>
     );
