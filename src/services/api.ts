@@ -52,12 +52,31 @@ export const api = {
             return response.json();
         },
 
-        createCompetition: async (hostId: number, data: any) => {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/hosts/${hostId}/create-competition`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
+        createCompetition: async (hostId: number, competitionData: any, datasetFile: File) => {
+            const formData = new FormData();
+
+            // Add all competition data fields
+            Object.keys(competitionData).forEach(key => {
+                if (key === 'tags' || key === 'rules') {
+                    // Arrays need to be handled specially
+                    formData.append(key, JSON.stringify(competitionData[key]));
+                } else {
+                    formData.append(key, competitionData[key]);
+                }
             });
+
+            // Add the file
+            formData.append('dataset_file', datasetFile);
+
+            const response = await fetch(
+                `${API_CONFIG.BASE_URL}/hosts/${hostId}/create-competition`,
+                {
+                    method: 'POST',
+                    body: formData,
+                    // Don't set Content-Type header, browser will set it with boundary
+                }
+            );
+
             if (!response.ok) {
                 const error = await response.json();
                 throw new Error(error.detail || 'Failed to create competition');

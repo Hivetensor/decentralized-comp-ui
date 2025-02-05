@@ -48,7 +48,55 @@ const CreateCompetitionForm = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const [datasetFile, setDatasetFile] = useState<File | null>(null);
+    const [fileError, setFileError] = useState<string | null>(null);
 
+    const validateFile = (file: File) => {
+        if (file.size > 100 * 1024 * 1024) { // 100MB
+            return "File size must be less than 100MB";
+        }
+        return null;
+    };
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const error = validateFile(file);
+            setFileError(error);
+            if (!error) {
+                setDatasetFile(file);
+            }
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!validateForm() || !datasetFile) return;
+        if (fileError) return;
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            const hostEmail = Object.keys(localStorage).find(key => key.startsWith('host_'));
+            if (!hostEmail) throw new Error('Host not found');
+
+            const hostData = JSON.parse(localStorage.getItem(hostEmail) || '{}');
+            await api.hosts.createCompetition(hostData.id, formData, datasetFile);
+
+            toast({
+                title: "Competition Created",
+                description: "Your competition has been created successfully",
+                variant: "success",
+            });
+
+            router.push('/host/dashboard');
+        } catch (err) {
+            setError('Failed to create competition. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -78,34 +126,6 @@ const CreateCompetitionForm = () => {
                 setErrors(newErrors);
             }
             return false;
-        }
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!validateForm()) return;
-        setLoading(true);
-        setError(null);
-
-        try {
-            // Get host email from localStorage
-            const hostEmail = Object.keys(localStorage).find(key => key.startsWith('host_'));
-            if (!hostEmail) throw new Error('Host not found');
-
-            const hostData = JSON.parse(localStorage.getItem(hostEmail) || '{}');
-            await api.hosts.createCompetition(hostData.id, formData);
-
-            toast({
-                title: "Competition Created",
-                description: "Your competition has been created successfully",
-                variant: "success",
-            })
-
-            router.push('/host/dashboard');
-        } catch (err) {
-            setError('Failed to create competition. Please try again.');
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -263,6 +283,30 @@ const CreateCompetitionForm = () => {
                                         <p className="text-red-400 text-sm mt-1">{errors.datasetDescription}</p>
                                     )}
                                 </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label className="text-gray-200">Dataset File</Label>
+                                <div className="relative">
+                                    <Input
+                                        type="file"
+                                        required
+                                        className={`bg-gray-700/50 border-gray-600 text-white ${
+                                            fileError ? 'border-red-500' : ''
+                                        }`}
+                                        onChange={handleFileChange}
+                                        accept=".csv,.xls,.xlsx,.zip"
+                                    />
+                                    {fileError && (
+                                        <p className="text-red-400 text-sm mt-1">{fileError}</p>
+                                    )}
+                                </div>
+                                {datasetFile && (
+                                    <p className="text-sm text-gray-400">
+                                        Selected
+                                        file: {datasetFile.name} ({(datasetFile.size / (1024 * 1024)).toFixed(2)}MB)
+                                    </p>
+                                )}
                             </div>
 
                             <div className="space-y-2">
