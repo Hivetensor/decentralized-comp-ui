@@ -113,12 +113,28 @@ const CompetitionDetail = () => {
             return;
         }
 
-        // TODO: Implement actual download logic
-        toast({
-            title: "Download Started",
-            description: "Your download will begin shortly",
-            variant: "success",
-        });
+        try {
+            const {downloadUrl} = await api.competitions.getDatasetDownloadUrl(competitionId);
+
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.click();
+
+            toast({
+                title: "Download Started",
+                description: "Your download will begin shortly",
+                variant: "success",
+            });
+        } catch (error) {
+            toast({
+                title: "Failed to download dataset",
+                description: error instanceof Error ? error.message : "Please try again",
+                variant: "destructive",
+            });
+        }
+
+
+
     };
 
     if (loading) {

@@ -120,6 +120,15 @@ export const api = {
                 throw new Error(error.detail || 'Failed to fetch leaderboard');
             }
             return response.json();
+        },
+
+        getDatasetDownloadUrl: async (competitionId: number) => {
+            const response = await fetch(`${API_CONFIG.BASE_URL}/competitions/${competitionId}/dataset-download-url`);
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.detail || 'Failed to fetch dataset download URL');
+            }
+            return response.json();
         }
     }
 };
