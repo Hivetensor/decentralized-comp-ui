@@ -1,27 +1,25 @@
-// CompetitionDetail.tsx
 'use client';
 
-import React, {useEffect, useState} from 'react';
-import {useParams, useRouter} from 'next/navigation';
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Badge} from "@/components/ui/badge";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import {Loader2, Play, Timer, Trophy, Users} from 'lucide-react';
-import {Alert, AlertDescription} from "@/components/ui/alert";
-import {Button} from "@/components/ui/button";
-import {UserRegistrationModal} from '@/components/UserRegistrationModal';
-import {useAuth} from '@/contexts/AuthContext';
-import {api} from '@/services/api';
-import {toast} from '@/hooks/use-toast';
+import React, { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Loader2, Play, Timer, Trophy, Users } from 'lucide-react';
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { UserRegistrationModal } from '@/components/UserRegistrationModal';
+import { useAuth } from '@/contexts/AuthContext';
+import { api } from '@/services/api';
+import { toast } from '@/hooks/use-toast';
 import LeaderboardComponent from './LeaderboardComponent';
-import {Competition, LeaderboardEntry} from '@/types';
+import { Competition, LeaderboardEntry } from '@/types';
 
 const CompetitionDetail = () => {
     const params = useParams();
     const competitionId = Number(params.id);
-    const {user} = useAuth();
+    const { user } = useAuth();
     const router = useRouter();
-
 
     const [competition, setCompetition] = useState<Competition | null>(null);
     const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -50,17 +48,13 @@ const CompetitionDetail = () => {
         fetchCompetitionData();
     }, [competitionId]);
 
-    const isUserInCompetition = user?.competitions?.some(
-        comp => comp.id === competitionId
-    );
-    const handleJoinClick = async () => {
-        if (!user) {
-            setShowRegistrationModal(true);
-            return;
-        }
+    // Check if user is already in this competition
+    const isUserInCompetition = user?.type === 'competitor' &&
+        user.data.competitions?.some(comp => comp.id === competitionId);
 
+    const handleJoinCompetition = async (walletAddress: string) => {
         try {
-            await api.users.registerForCompetition(user.walletAddress, competitionId);
+            await api.users.registerForCompetition(walletAddress, competitionId);
             toast({
                 title: "Success",
                 description: "You've successfully joined the competition!",
@@ -68,24 +62,21 @@ const CompetitionDetail = () => {
             });
             router.refresh();
         } catch (error) {
-            toast({
-                title: "Failed to join competition",
-                description: error instanceof Error ? error.message : "Please try again",
-                variant: "destructive",
-            });
+            throw new Error(error instanceof Error ? error.message : "Failed to join competition");
         }
     };
 
     const handleRegistrationSubmit = async (data: { username: string; walletAddress: string }) => {
         try {
+            // First register the user
             await api.users.register(data);
+
+            // Then log them in
             await api.users.login(data);
-            await api.users.registerForCompetition(data.walletAddress, competitionId);
-            toast({
-                title: "Registration Successful",
-                description: "You can now join competitions!",
-                variant: "success",
-            });
+
+            // Finally register them for the competition
+            await handleJoinCompetition(data.walletAddress);
+
             setShowRegistrationModal(false);
             router.refresh();
         } catch (error) {
@@ -97,47 +88,84 @@ const CompetitionDetail = () => {
         }
     };
 
-    const handleDownloadClick = async () => {
+    const handleJoinClick = async () => {
         if (!user) {
-            const wantToRegister = window.confirm("You need to register to access this. Would you like to register now?");
-            if (wantToRegister) {
-                setShowRegistrationModal(true);
-            }
+            setShowRegistrationModal(true);
             return;
         }
 
-        if (isUserInCompetition) {
-            const wantToJoin = window.confirm("You need to join this competition first. Would you like to join now?");
-            if (wantToJoin) {
-                await handleJoinClick();
-            }
+        if (user.type !== 'competitor') {
+            toast({
+                title: "Access Denied",
+                description: "Only competitors can join competitions",
+                variant: "destructive",
+            });
             return;
         }
 
         try {
-            const {downloadUrl} = await api.competitions.getDatasetDownloadUrl(competitionId);
-
-            const link = document.createElement('a');
-            link.href = downloadUrl;
-            link.download = `dataset-${competitionId}`
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            toast({
-                title: "Download Started",
-                description: "Your download will begin shortly",
-                variant: "success",
-            });
+            await handleJoinCompetition(user.data.walletAddress);
         } catch (error) {
             toast({
-                title: "Failed to download dataset",
+                title: "Failed to join competition",
                 description: error instanceof Error ? error.message : "Please try again",
                 variant: "destructive",
             });
         }
+    };
 
+    const handleDownloadClick = async () => {
+        if (!user) {
+            toast({
+                title: "Authentication Required",
+                description: "Please register or log in to download the dataset",
+                variant: "destructive",
+            });
+            setShowRegistrationModal(true);
+            return;
+        }
 
+        if (user.type !== 'competitor') {
+            toast({
+                title: "Access Denied",
+                description: "Only competitors can download datasets",
+                variant: "destructive",
+            });
+            return;
+        }
 
+        if (!isUserInCompetition) {
+            toast({
+                title: "Access Denied",
+                description: "You must join the competition to download the dataset",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        try {
+            const { downloadUrl } = await api.competitions.getDatasetDownloadUrl(competitionId);
+
+            // Create temporary link and trigger download
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = `dataset-${competitionId}`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            toast({
+                title: "Download Started",
+                description: "Your dataset download will begin shortly",
+                variant: "success",
+            });
+        } catch (error) {
+            toast({
+                title: "Download Failed",
+                description: error instanceof Error ? error.message : "Please try again",
+                variant: "destructive",
+            });
+        }
     };
 
     if (loading) {
@@ -183,18 +211,19 @@ const CompetitionDetail = () => {
                         </div>
 
                         <div className="w-full md:w-auto">
-                            { !isUserInCompetition ? (
-                                <button
-                                    className="w-full md:w-auto px-10 py-4 text-lg bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 rounded-md text-white font-medium shadow-lg hover:shadow-xl transition-all"
-                                    onClick={handleJoinClick}
-                                >
-                                    Join Competition
-                                </button>
-                            ) : (
-                                <div
-                                    className="text-green-400 font-medium bg-green-900/20 px-6 py-3 rounded-md border border-green-500/20">
+                            {isUserInCompetition ? (
+                                <div className="text-green-400 font-medium bg-green-900/20 px-6 py-3 rounded-md border border-green-500/20">
                                     Already Joined
                                 </div>
+                            ) : (
+                                user?.type !== 'host' && (
+                                    <Button
+                                        onClick={handleJoinClick}
+                                        className="w-full md:w-auto px-10 py-4 text-lg bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700"
+                                    >
+                                        Join Competition
+                                    </Button>
+                                )
                             )}
                         </div>
                     </div>
@@ -265,13 +294,28 @@ const CompetitionDetail = () => {
                             <CardHeader>
                                 <CardTitle className="text-2xl text-gray-100">Competition Overview</CardTitle>
                             </CardHeader>
-                            <CardContent>
-                                <p className="text-gray-200 leading-relaxed">{competition.description}</p>
+                            <CardContent className="space-y-6">
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-200 mb-2">Description</h3>
+                                    <p className="text-gray-300">{competition.description}</p>
+                                </div>
+
+                                {/*<div>*/}
+                                {/*    <h3 className="text-lg font-semibold text-gray-200 mb-2">Dataset Description</h3>*/}
+                                {/*    <p className="text-gray-300">{competition.dataset_description}</p>*/}
+                                {/*</div>*/}
+
+                                {/*<div>*/}
+                                {/*    <h3 className="text-lg font-semibold text-gray-200 mb-2">Evaluation Metric</h3>*/}
+                                {/*    <p className="text-gray-300">{competition.evaluation_metric}</p>*/}
+                                {/*</div>*/}
+
                                 <Button
                                     onClick={handleDownloadClick}
-                                    className="mt-6 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700"
+                                    className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700"
+                                    disabled={!isUserInCompetition}
                                 >
-                                    Download Dataset
+                                    {isUserInCompetition ? 'Download Dataset' : 'Join to Download Dataset'}
                                 </Button>
                             </CardContent>
                         </Card>

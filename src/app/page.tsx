@@ -1,40 +1,54 @@
 'use client';
 
 import React, {useState} from 'react';
-import {useRouter} from 'next/navigation';
-import {useUser} from '@/contexts/UserContext';
-import {Button} from '@/components/ui/button';
-import {HostRegistrationModal} from '@/components/HostRegistrationModal';
-import {toast} from '@/hooks/use-toast';
-import {api} from '@/services/api';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { HostRegistrationModal } from '@/components/HostRegistrationModal';
+import { toast } from '@/hooks/use-toast';
 
 const HomePage = () => {
     const router = useRouter();
-    const {user} = useUser();
+    const { user, login } = useAuth();
     const [showHostRegistration, setShowHostRegistration] = useState(false);
 
     const handleJoinClick = () => {
         if (user) {
-            router.push('/competitions');
+            if (user.type === 'competitor') {
+                router.push('/competitions');
+            } else {
+                toast({
+                    title: "Access Denied",
+                    description: "Only competitors can join competitions",
+                    variant: "destructive",
+                });
+            }
         } else {
             router.push('/competitions');
         }
     };
 
     const handleHostClick = () => {
-        setShowHostRegistration(true);
+        if (user) {
+            if (user.type === 'host') {
+                router.push('/host/dashboard');
+            } else {
+                toast({
+                    title: "Access Denied",
+                    description: "You're already registered as a competitor",
+                    variant: "destructive",
+                });
+            }
+        } else {
+            setShowHostRegistration(true);
+        }
     };
 
     const handleHostRegistration = async (data: { email: string; organization: string; contactName: string }) => {
         try {
-            const response = await api.hosts.register(data);
-            toast({
-                title: "Host Registration Successful",
-                description: "You can now create competitions!",
-                variant: "success",
-            });
+            await login.host(data.email, data.organization, data.contactName);
             setShowHostRegistration(false);
-            router.push('/host/createCompetition');
+            router.push('/host/dashboard');
         } catch (error) {
             toast({
                 title: "Registration Failed",
@@ -43,31 +57,49 @@ const HomePage = () => {
             });
         }
     };
-
     return (
         <div className="bg-black text-white flex flex-col min-h-screen">
             <div className="flex-grow relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-900/50 to-cyan-900/50"/>
                 <div className="relative px-4 py-12 md:px-6 md:py-32 mx-auto max-w-7xl">
-                    {/* Removed the flex-row layout and made content centered */}
                     <div className="text-center max-w-4xl mx-auto">
                         <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold mb-6 md:mb-24 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
                             Solving real life AI and Data Science problems through Competitions
                         </h1>
 
                         <div className="flex flex-col md:flex-row justify-center gap-4 mb-8 md:mb-12">
-                            <Button
-                                onClick={handleJoinClick}
-                                className="w-full md:w-auto px-6 md:px-10 py-4 md:py-8 text-base md:text-lg bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 rounded-md"
-                            >
-                                Join a Competition
-                            </Button>
-                            <Button
-                                onClick={handleHostClick}
-                                className="w-full md:w-auto px-6 md:px-10 py-4 md:py-8 text-base md:text-lg bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 rounded-md"
-                            >
-                                Host a Competition
-                            </Button>
+                            {user ? (
+                                user.type === 'competitor' ? (
+                                    <Button
+                                        onClick={() => router.push('/competitions')}
+                                        className="w-full md:w-auto px-6 md:px-10 py-4 md:py-8 text-base md:text-lg bg-gradient-to-r from-purple-600 to-cyan-600"
+                                    >
+                                        View Competitions
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        onClick={() => router.push('/host/dashboard')}
+                                        className="w-full md:w-auto px-6 md:px-10 py-4 md:py-8 text-base md:text-lg bg-gradient-to-r from-purple-600 to-cyan-600"
+                                    >
+                                        Host Dashboard
+                                    </Button>
+                                )
+                            ) : (
+                                <>
+                                    <Button
+                                        onClick={handleJoinClick}
+                                        className="w-full md:w-auto px-6 md:px-10 py-4 md:py-8 text-base md:text-lg bg-gradient-to-r from-purple-600 to-cyan-600"
+                                    >
+                                        Join a Competition
+                                    </Button>
+                                    <Button
+                                        onClick={handleHostClick}
+                                        className="w-full md:w-auto px-6 md:px-10 py-4 md:py-8 text-base md:text-lg bg-gradient-to-r from-purple-600 to-cyan-600"
+                                    >
+                                        Host a Competition
+                                    </Button>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

@@ -1,17 +1,13 @@
+// services/api.ts
 import {API_CONFIG} from '@/config/api';
 
 export const api = {
     users: {
         register: async (data: { username: string, walletAddress: string }) => {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/users/register`, {
+            const response = await fetch(`${API_CONFIG.BASE_URL}/api/v1/users/register`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(
-                    {
-                        username: data.username,
-                        wallet_address: data.walletAddress
-                    }
-                )
+                body: JSON.stringify(data)
             });
             if (!response.ok) {
                 const error = await response.json();
@@ -20,19 +16,8 @@ export const api = {
             return response.json();
         },
 
-        registerForCompetition: async (walletAddress: string, competitionId: number) => {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/users/${walletAddress}/${competitionId}/register`, {
-                method: 'POST'
-            });
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || 'Competition registration failed');
-            }
-            return response.json();
-        },
-
         login: async (data: { username: string; walletAddress: string }) => {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/users/login`, {
+            const response = await fetch(`${API_CONFIG.BASE_URL}/api/v1/users/login`, {
                 method: 'POST',
                 credentials: 'include', // Important for cookies
                 headers: { 'Content-Type': 'application/json' },
@@ -43,7 +28,7 @@ export const api = {
         },
 
         getProfile: async () => {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/users/profile`, {
+            const response = await fetch(`${API_CONFIG.BASE_URL}/api/v1/users/profile`, {
                 credentials: 'include',
             });
             if (!response.ok) throw new Error('Failed to get profile');
@@ -51,7 +36,7 @@ export const api = {
         },
 
         logout: async () => {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/users/logout`, {
+            const response = await fetch(`${API_CONFIG.BASE_URL}/api/v1/users/logout`, {
                 method: 'POST',
                 credentials: 'include',
             });
@@ -59,20 +44,25 @@ export const api = {
             return response.json();
         },
 
+        registerForCompetition: async (walletAddress: string, competitionId: number) => {
+            const response = await fetch(`${API_CONFIG.BASE_URL}/api/v1/users/${walletAddress}/${competitionId}/register`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.detail || 'Competition registration failed');
+            }
+            return response.json();
+        },
     },
 
     hosts: {
         register: async (data: { email: string, organization: string, contactName: string }) => {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/hosts/register`, {
+            const response = await fetch(`${API_CONFIG.BASE_URL}/api/v1/hosts/register`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(
-                    {
-                        email: data.email,
-                        organization: data.organization,
-                        contact_name: data.contactName
-                    }
-                )
+                body: JSON.stringify(data)
             });
             if (!response.ok) {
                 const error = await response.json();
@@ -81,28 +71,44 @@ export const api = {
             return response.json();
         },
 
-        createCompetition: async (hostId: number, competitionData: any, datasetFile: File) => {
+        login: async (data: { email: string; organization: string; contactName: string }) => {
+            const response = await fetch(`${API_CONFIG.BASE_URL}/api/v1/hosts/login`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data),
+            });
+            if (!response.ok) throw new Error('Login failed');
+            return response.json();
+        },
+
+        getProfile: async () => {
+            const response = await fetch(`${API_CONFIG.BASE_URL}/api/v1/hosts/profile`, {
+                credentials: 'include',
+            });
+            if (!response.ok) throw new Error('Failed to get profile');
+            return response.json();
+        },
+
+        createCompetition: async (competitionData: any, datasetFile: File) => {
             const formData = new FormData();
 
-            // Add all competition data fields
             Object.keys(competitionData).forEach(key => {
                 if (key === 'tags' || key === 'rules') {
-                    // Arrays need to be handled specially
                     formData.append(key, JSON.stringify(competitionData[key]));
                 } else {
                     formData.append(key, competitionData[key]);
                 }
             });
 
-            // Add the file
             formData.append('dataset_file', datasetFile);
 
             const response = await fetch(
-                `${API_CONFIG.BASE_URL}/hosts/${hostId}/create-competition`,
+                `${API_CONFIG.BASE_URL}/api/v1/hosts/create-competition`,
                 {
                     method: 'POST',
+                    credentials: 'include',
                     body: formData,
-                    // Don't set Content-Type header, browser will set it with boundary
                 }
             );
 
@@ -112,20 +118,11 @@ export const api = {
             }
             return response.json();
         },
-
-        getProfile: async (email: string) => {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/hosts/${email}`);
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || 'Failed to fetch host profile');
-            }
-            return response.json();
-        }
     },
 
     competitions: {
         getAll: async () => {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/competitions/competitions`);
+            const response = await fetch(`${API_CONFIG.BASE_URL}/api/v1/competitions/competitions`);
             if (!response.ok) {
                 const error = await response.json();
                 throw new Error(error.detail || 'Failed to fetch competitions');
@@ -134,7 +131,7 @@ export const api = {
         },
 
         getOne: async (id: number) => {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/competitions/${id}`);
+            const response = await fetch(`${API_CONFIG.BASE_URL}/api/v1/competitions/${id}`);
             if (!response.ok) {
                 const error = await response.json();
                 throw new Error(error.detail || 'Failed to fetch competition');
@@ -143,7 +140,7 @@ export const api = {
         },
 
         getLeaderboard: async (competitionId: number) => {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/competitions/${competitionId}/leaderboard`);
+            const response = await fetch(`${API_CONFIG.BASE_URL}/api/v1/competitions/${competitionId}/leaderboard`);
             if (!response.ok) {
                 const error = await response.json();
                 throw new Error(error.detail || 'Failed to fetch leaderboard');
@@ -152,7 +149,9 @@ export const api = {
         },
 
         getDatasetDownloadUrl: async (competitionId: number) => {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/competitions/${competitionId}/dataset-download-url`);
+            const response = await fetch(`${API_CONFIG.BASE_URL}/api/v1/competitions/${competitionId}/dataset-download-url`, {
+                credentials: 'include'
+            });
             if (!response.ok) {
                 const error = await response.json();
                 throw new Error(error.detail || 'Failed to fetch dataset download URL');

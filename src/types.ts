@@ -20,6 +20,7 @@ export interface LeaderboardEntry {
     submission_date: number;
 }
 
+// types/auth.ts
 export interface User {
     username: string;
     walletAddress: string;
@@ -27,7 +28,6 @@ export interface User {
     competitions?: Array<{
         id: number;
         title: string;
-        rank?: number;
         status: 'active' | 'completed';
         joinedAt: string;
     }>;

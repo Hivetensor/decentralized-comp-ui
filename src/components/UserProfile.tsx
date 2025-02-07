@@ -6,7 +6,6 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Badge} from "@/components/ui/badge";
 import {Clock, Trophy} from 'lucide-react';
 import {Alert, AlertDescription} from "@/components/ui/alert";
-import {useUser} from '@/contexts/UserContext';
 import Link from 'next/link';
 
 const UserProfile = () => {

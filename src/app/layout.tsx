@@ -3,7 +3,6 @@ import localFont from "next/font/local";
 import "./globals.css";
 import NavigationMenu from '@/components/NavigationMenu';
 import Footer from '@/components/Footer';
-import {UserProvider} from '@/contexts/UserContext';
 import {Toaster} from '@/components/ui/toaster';
 import {AuthProvider} from "@/contexts/AuthContext";
 
@@ -33,12 +32,10 @@ export default function RootLayout({
         </head>
         <body>
         <AuthProvider>
-        <UserProvider>
             <NavigationMenu/>
             {children}
             <Footer/>
             <Toaster/>
-        </UserProvider>
         </AuthProvider>
         </body>
         </html>

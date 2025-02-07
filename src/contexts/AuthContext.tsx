@@ -1,13 +1,16 @@
 // contexts/AuthContext.tsx
-import { createContext, useContext, useEffect, useState } from 'react';
-import { api } from '@/services/api';
-import {AuthUser, User} from '@/types';
+import {createContext, useContext, useEffect, useState} from 'react';
+import {api} from '@/services/api';
+import {AuthUser} from "@/types";
 
 interface AuthContextType {
-    user: User | null;
-    login: (username: string, walletAddress: string) => Promise<void>;
-    logout: () => Promise<void>;
+    user: AuthUser | null;
     isLoading: boolean;
+    login: {
+        competitor: (username: string, walletAddress: string) => Promise<void>;
+        host: (email: string, organization: string, contactName: string) => Promise<void>;
+    };
+    logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,10 +23,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Check session on mount
         setIsLoading(true);
         api.users.getProfile()
-            .then(user => setUser(user))
-            .catch(() => setUser(null));
+            .then(user => {
+                if (user) {
+                    setUser({type: 'competitor', data: user});
+                }
+            })
+            .catch(() => {
+                // Try host profile if user profile fails
+                api.hosts.getProfile()
+                    .then(host => {
+                        if (host) {
+                            setUser({type: 'host', data: host});
+                        }
+                    })
+                    .catch(() => setUser(null))
+            })
+            .finally(() => setIsLoading(false));
     }, []);
-
 
     const login = {
         competitor: async (username: string, walletAddress: string) => {
@@ -37,6 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setUser({ type: 'host', data: hostData });
         }
     };
+
     const logout = async () => {
         await api.users.logout();
         setUser(null);
