@@ -1,10 +1,10 @@
-import UserProfilePage from '@/components/UserProfilePage';
 import {ProtectedRoute} from "@/components/ProtectedRoute";
+import UserProfile from "@/components/UserProfile";
 
 export default function ProfilePage() {
     return (
         <ProtectedRoute requiresCompetitor>
-            <UserProfilePage/>
+            <UserProfile/>
         </ProtectedRoute>
     )
 }
