@@ -2,7 +2,7 @@
 'use client';
 
 import React, {useEffect, useState} from 'react';
-import {useParams} from 'next/navigation';
+import {useParams, useRouter} from 'next/navigation';
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Badge} from "@/components/ui/badge";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
@@ -10,7 +10,7 @@ import {Loader2, Play, Timer, Trophy, Users} from 'lucide-react';
 import {Alert, AlertDescription} from "@/components/ui/alert";
 import {Button} from "@/components/ui/button";
 import {UserRegistrationModal} from '@/components/UserRegistrationModal';
-import {useUser} from '@/contexts/UserContext';
+import {useAuth} from '@/contexts/AuthContext';
 import {api} from '@/services/api';
 import {toast} from '@/hooks/use-toast';
 import LeaderboardComponent from './LeaderboardComponent';
@@ -19,7 +19,9 @@ import {Competition, LeaderboardEntry} from '@/types';
 const CompetitionDetail = () => {
     const params = useParams();
     const competitionId = Number(params.id);
-    const {user, isInCompetition, joinCompetition} = useUser();
+    const {user} = useAuth();
+    const router = useRouter();
+
 
     const [competition, setCompetition] = useState<Competition | null>(null);
     const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -48,6 +50,9 @@ const CompetitionDetail = () => {
         fetchCompetitionData();
     }, [competitionId]);
 
+    const isUserInCompetition = user?.competitions?.some(
+        comp => comp.id === competitionId
+    );
     const handleJoinClick = async () => {
         if (!user) {
             setShowRegistrationModal(true);
@@ -56,12 +61,12 @@ const CompetitionDetail = () => {
 
         try {
             await api.users.registerForCompetition(user.walletAddress, competitionId);
-            joinCompetition(competitionId, competition?.title || '');
             toast({
                 title: "Success",
                 description: "You've successfully joined the competition!",
                 variant: "success",
             });
+            router.refresh();
         } catch (error) {
             toast({
                 title: "Failed to join competition",
@@ -74,19 +79,15 @@ const CompetitionDetail = () => {
     const handleRegistrationSubmit = async (data: { username: string; walletAddress: string }) => {
         try {
             await api.users.register(data);
+            await api.users.login(data);
+            await api.users.registerForCompetition(data.walletAddress, competitionId);
             toast({
                 title: "Registration Successful",
                 description: "You can now join competitions!",
                 variant: "success",
             });
             setShowRegistrationModal(false);
-            // After successful registration, join the competition
-            await api.users.registerForCompetition(data.walletAddress, competitionId);
-            toast({
-                title: "Success",
-                description: "You've successfully joined the competition!",
-                variant: "success",
-            });
+            router.refresh();
         } catch (error) {
             toast({
                 title: "Registration Failed",
@@ -105,7 +106,7 @@ const CompetitionDetail = () => {
             return;
         }
 
-        if (!isInCompetition(competitionId)) {
+        if (isUserInCompetition) {
             const wantToJoin = window.confirm("You need to join this competition first. Would you like to join now?");
             if (wantToJoin) {
                 await handleJoinClick();
@@ -118,8 +119,10 @@ const CompetitionDetail = () => {
 
             const link = document.createElement('a');
             link.href = downloadUrl;
+            link.download = `dataset-${competitionId}`
+            document.body.appendChild(link);
             link.click();
-
+            document.body.removeChild(link);
             toast({
                 title: "Download Started",
                 description: "Your download will begin shortly",
@@ -180,7 +183,7 @@ const CompetitionDetail = () => {
                         </div>
 
                         <div className="w-full md:w-auto">
-                            {!isInCompetition(competitionId) ? (
+                            { !isUserInCompetition ? (
                                 <button
                                     className="w-full md:w-auto px-10 py-4 text-lg bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 rounded-md text-white font-medium shadow-lg hover:shadow-xl transition-all"
                                     onClick={handleJoinClick}

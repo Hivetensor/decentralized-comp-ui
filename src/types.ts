@@ -20,18 +20,30 @@ export interface LeaderboardEntry {
     submission_date: number;
 }
 
-export interface UserProfile {
+export interface User {
     username: string;
     walletAddress: string;
     joinedAt: string;
-    competitions: {
+    competitions?: Array<{
         id: number;
         title: string;
         rank?: number;
         status: 'active' | 'completed';
         joinedAt: string;
-    }[];
+    }>;
 }
+
+export interface Host {
+    email: string;
+    organization: string;
+    contactName: string;
+    status: 'pending' | 'approved';
+    createdAt: string;
+}
+
+export type AuthUser =
+    | { type: 'competitor'; data: User }
+    | { type: 'host'; data: Host };
 
 // types/api.ts
 export interface ApiResponse<T> {

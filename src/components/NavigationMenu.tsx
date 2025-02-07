@@ -1,42 +1,27 @@
 'use client';
 
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import Link from 'next/link';
 import {useRouter} from 'next/navigation';
-import {useUser} from '@/contexts/UserContext';
-import {RegistrationChoiceModal} from './RegistrationChoiceModal';
+import {useAuth} from '@/contexts/AuthContext';
 import {UserRegistrationModal} from '@/components/UserRegistrationModal';
 import {HostRegistrationModal} from '@/components/HostRegistrationModal';
+import {RegistrationChoiceModal} from '@/components/RegistrationChoiceModal';
 import {toast} from '@/hooks/use-toast';
-import {api} from '@/services/api';
+import {api} from "@/services/api";
 
 const NavigationMenu = () => {
     const router = useRouter();
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const {user, login, logout} = useAuth();
     const [showChoiceModal, setShowChoiceModal] = useState(false);
     const [showCompetitorRegistration, setShowCompetitorRegistration] = useState(false);
     const [showHostRegistration, setShowHostRegistration] = useState(false);
-    const {user, registerUser} = useUser();
-    const [hostEmail, setHostEmail] = useState<string | null>(null);
 
-    useEffect(() => {
-        setHostEmail(getHostEmail());
-    }, []);
     const handleCompetitorRegistration = async (data: { username: string; walletAddress: string }) => {
         try {
-            const response = await api.users.register(data);
-
-            registerUser(data.username, data.walletAddress);
-
-            toast({
-                title: "Registration Successful",
-                description: "Welcome to HiveTensor!",
-                variant: "success",
-            });
-
+            await login(data.username, data.walletAddress);
             setShowCompetitorRegistration(false);
             router.push(`/profile/${data.walletAddress}`);
-
         } catch (error) {
             toast({
                 title: "Registration Failed",
@@ -65,27 +50,6 @@ const NavigationMenu = () => {
         }
     };
 
-    const getHostEmail = () => {
-        if (typeof window === 'undefined') return null; // Check if we're in browser
-
-        const hostKey = Object.keys(localStorage).find(key => key.startsWith('host_'));
-        if (hostKey) {
-            const hostData = JSON.parse(localStorage.getItem(hostKey) || '{}');
-            return hostData.email;
-        }
-        return null;
-    };
-
-    const handleProfileClick = () => {
-        const hostEmail = getHostEmail();
-        if (user) {
-            router.push(`/profile/${user.walletAddress}`);
-        } else if (hostEmail) {
-            router.push(`/host/profile/${hostEmail}`);
-        } else {
-            setShowChoiceModal(true);
-        }
-    };
     return (
         <div className="bg-gray-900 border-b border-gray-800">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -105,14 +69,14 @@ const NavigationMenu = () => {
                                   className="text-gray-300 hover:text-white transition-colors text-base font-medium">
                                 Competitions
                             </Link>
-                            {<Link href="/datasets"
-                                   className="text-gray-300 hover:text-white transition-colors text-base font-medium">
+                            <Link href="/datasets"
+                                  className="text-gray-300 hover:text-white transition-colors text-base font-medium">
                                 Datasets
-                            </Link>}{
+                            </Link>
                             <Link href="/leaderboard"
                                   className="text-gray-300 hover:text-white transition-colors text-base font-medium">
                                 Leaderboard
-                            </Link>}
+                            </Link>
                             <Link href="/about"
                                   className="text-gray-300 hover:text-white transition-colors text-base font-medium">
                                 About
@@ -121,56 +85,32 @@ const NavigationMenu = () => {
                     </div>
 
                     <div className="flex-1 flex justify-end">
-                        <button
-                            onClick={handleProfileClick}
-                            className="px-6 py-2 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 rounded-md text-white"
-                        >
-                            {user ? 'My Profile' : (getHostEmail() ? 'Host Dashboard' : 'Register')}
-                        </button>
-                    </div>
-
-                    <div className="md:hidden ml-4">
-                        <button
-                            type="button"
-                            className="p-2 text-gray-300 hover:text-white"
-                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        >
-                            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                      d="M4 6h16M4 12h16M4 18h16"/>
-                            </svg>
-                        </button>
+                        {user ? (
+                            <div className="flex items-center gap-4">
+                                <span className="text-gray-300">
+                                    Welcome, {user.username}
+                                </span>
+                                <button
+                                    onClick={async () => {
+                                        await logout();
+                                        router.push('/');
+                                    }}
+                                    className="px-4 py-2 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-md text-white"
+                                >
+                                    Logout
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => setShowChoiceModal(true)}
+                                className="px-6 py-2 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-md text-white"
+                            >
+                                Connect Wallet
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>
-
-            {mobileMenuOpen && (
-                <div className="md:hidden absolute w-full bg-gray-900 border-b border-gray-800 shadow-lg z-50">
-                    <div className="px-4 py-3 space-y-3">
-                        <Link
-                            href="/competitions"
-                            className="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
-                            onClick={() => setMobileMenuOpen(false)}
-                        >
-                            Competitions
-                        </Link>
-                        <Link
-                            href="/about"
-                            className="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
-                            onClick={() => setMobileMenuOpen(false)}
-                        >
-                            About Us
-                        </Link>
-                        <Link
-                            href="/leaderboard"
-                            className="block px-3 py-2 text-base font-medium text-gray-300 hover:text-white hover:bg-gray-800 rounded-md"
-                            onClick={() => setMobileMenuOpen(false)}
-                        >
-                            Leaderboard
-                        </Link>
-                    </div>
-                </div>
-            )}
 
             <RegistrationChoiceModal
                 isOpen={showChoiceModal}

@@ -1,41 +1,49 @@
 // contexts/AuthContext.tsx
 import { createContext, useContext, useEffect, useState } from 'react';
 import { api } from '@/services/api';
-import { UserProfile } from '@/types';
+import {AuthUser, User} from '@/types';
 
 interface AuthContextType {
-    user: UserProfile | null;
+    user: User | null;
     login: (username: string, walletAddress: string) => Promise<void>;
     logout: () => Promise<void>;
+    isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<UserProfile | null>(null);
+    const [user, setUser] = useState<AuthUser | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         // Check session on mount
+        setIsLoading(true);
         api.users.getProfile()
             .then(user => setUser(user))
             .catch(() => setUser(null));
     }, []);
 
-    const login = async (username: string, walletAddress: string) => {
-        const response = await api.users.login({ username, walletAddress });
-        if (response.ok) {
-            const user = await api.users.getProfile();
-            setUser(user);
+
+    const login = {
+        competitor: async (username: string, walletAddress: string) => {
+            const response = await api.users.login({ username, walletAddress });
+            const userData = await api.users.getProfile();
+            setUser({ type: 'competitor', data: userData });
+        },
+        host: async (email: string, organization: string, contactName: string) => {
+            const response = await api.hosts.login({ email, organization, contactName });
+            const hostData = await api.hosts.getProfile();
+            setUser({ type: 'host', data: hostData });
         }
     };
-
     const logout = async () => {
         await api.users.logout();
         setUser(null);
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{ user, login, logout, isLoading }}>
             {children}
         </AuthContext.Provider>
     );
