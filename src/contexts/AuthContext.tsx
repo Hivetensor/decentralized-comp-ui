@@ -1,4 +1,4 @@
-// contexts/AuthContext.tsx
+'use client';
 import {createContext, useContext, useEffect, useState} from 'react';
 import {api} from '@/services/api';
 import {AuthUser} from "@/types";
@@ -6,6 +6,10 @@ import {AuthUser} from "@/types";
 interface AuthContextType {
     user: AuthUser | null;
     isLoading: boolean;
+    register: {
+        competitor: (username: string, walletAddress: string) => Promise<void>;
+        host: (username: string, organization: string, contactName: string) => Promise<void>;
+    };
     login: {
         competitor: (username: string, walletAddress: string) => Promise<void>;
         host: (email: string, organization: string, contactName: string) => Promise<void>;
@@ -19,28 +23,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
+    // contexts/AuthContext.tsx
     useEffect(() => {
-        // Check session on mount
-        setIsLoading(true);
-        api.users.getProfile()
-            .then(user => {
-                if (user) {
-                    setUser({type: 'competitor', data: user});
+        const checkSession = async () => {
+            try {
+                setIsLoading(true);
+                const response = await api.users.getProfile();
+                if (response) {
+                    setUser({ type: 'competitor', data: response });
                 }
-            })
-            .catch(() => {
-                // Try host profile if user profile fails
-                api.hosts.getProfile()
-                    .then(host => {
-                        if (host) {
-                            setUser({type: 'host', data: host});
-                        }
-                    })
-                    .catch(() => setUser(null))
-            })
-            .finally(() => setIsLoading(false));
-    }, []);
+            } catch (userError) {
+                try {
+                    const hostResponse = await api.hosts.getProfile();
+                    if (hostResponse) {
+                        setUser({ type: 'host', data: hostResponse });
+                    }
+                } catch (hostError) {
+                    setUser(null);
+                }
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
+        checkSession();
+    }, []);
     const login = {
         competitor: async (username: string, walletAddress: string) => {
             const response = await api.users.login({ username, walletAddress });
@@ -54,13 +61,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    const register = {
+        competitor: async (username: string, walletAddress: string) => {
+            await api.users.register({username, walletAddress});
+            // After registration, automatically log them in
+            const userData = await api.users.login({username, walletAddress});
+            setUser({type: 'competitor', data: userData});
+        },
+        host: async (email: string, organization: string, contactName: string) => {
+            await api.hosts.register({email, organization, contactName});
+            const hostData = await api.hosts.login({email, organization, contactName});
+            setUser({type: 'host', data: hostData});
+        }
+    };
+
     const logout = async () => {
         await api.users.logout();
         setUser(null);
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+        <AuthContext.Provider value={{user, register, login, logout, isLoading}}>
             {children}
         </AuthContext.Provider>
     );

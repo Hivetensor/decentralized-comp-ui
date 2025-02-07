@@ -1,24 +1,44 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import { UserRegistrationModal } from '@/components/UserRegistrationModal';
-import { HostRegistrationModal } from '@/components/HostRegistrationModal';
-import { RegistrationChoiceModal } from '@/components/RegistrationChoiceModal';
-import { toast } from '@/hooks/use-toast';
+import {useRouter} from 'next/navigation';
+import {useAuth} from '@/contexts/AuthContext';
+import {UserRegistrationModal} from '@/components/UserRegistrationModal';
+import {HostRegistrationModal} from '@/components/HostRegistrationModal';
+import {RegistrationChoiceModal} from '@/components/RegistrationChoiceModal';
+import {toast} from '@/hooks/use-toast';
+import { User } from 'lucide-react';
+
 
 const NavigationMenu = () => {
     const router = useRouter();
-    const { user, login, logout } = useAuth();
+    const { user, register, login, logout } = useAuth();
     const [showChoiceModal, setShowChoiceModal] = useState(false);
     const [showCompetitorRegistration, setShowCompetitorRegistration] = useState(false);
     const [showHostRegistration, setShowHostRegistration] = useState(false);
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
 
+    // components/NavigationMenu.tsx
     const handleCompetitorRegistration = async (data: { username: string; walletAddress: string }) => {
         try {
-            await login.competitor(data.username, data.walletAddress);
+            try {
+                // Try logging in first
+                await login.competitor(data.username, data.walletAddress);
+                toast({
+                    title: "Welcome Back!",
+                    description: "You were already registered. Logged in successfully.",
+                    variant: "success",
+                });
+            } catch {
+                // If login fails, try registering
+                await register.competitor(data.username, data.walletAddress);
+                toast({
+                    title: "Registration Successful",
+                    description: "Welcome to HiveTensor!",
+                    variant: "success",
+                });
+            }
             setShowCompetitorRegistration(false);
             router.push(`/profile/${data.walletAddress}`);
         } catch (error) {
@@ -30,9 +50,10 @@ const NavigationMenu = () => {
         }
     };
 
+
     const handleHostRegistration = async (data: { email: string; organization: string; contactName: string }) => {
         try {
-            await login.host(data.email, data.organization, data.contactName);
+            await register.host(data.email, data.organization, data.contactName);
             setShowHostRegistration(false);
             router.push('/host/dashboard');
         } catch (error) {
@@ -74,43 +95,48 @@ const NavigationMenu = () => {
                     </div>
 
                     {/* Auth Section */}
-                    <div className="flex items-center gap-4">
-                        {user ? (
-                            <>
-                                {/* Profile Link */}
-                                <Link
-                                    href={user.type === 'competitor'
-                                        ? `/profile/${user.data.walletAddress}`
-                                        : '/host/dashboard'
-                                    }
-                                    className="text-gray-300 hover:text-white transition-colors"
-                                >
-                                    {user.type === 'competitor'
-                                        ? user.data.username
-                                        : user.data.organization
-                                    }
-                                </Link>
-
-                                {/* Logout Button */}
-                                <button
-                                    onClick={async () => {
-                                        await logout();
-                                        router.push('/');
-                                    }}
-                                    className="px-4 py-2 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-md text-white hover:from-purple-700 hover:to-cyan-700"
-                                >
-                                    Logout
-                                </button>
-                            </>
-                        ) : (
+                    {user ? (
+                        <div className="relative">
                             <button
-                                onClick={() => setShowChoiceModal(true)}
-                                className="px-6 py-2 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-md text-white hover:from-purple-700 hover:to-cyan-700"
+                                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                                className="p-2 rounded-full hover:bg-gray-800 transition-colors"
                             >
-                                Connect
+                                <User className="h-6 w-6 text-gray-300" />
                             </button>
-                        )}
-                    </div>
+
+                            {showProfileMenu && (
+                                <div className="absolute right-0 mt-2 w-48 py-2 bg-gray-900 rounded-md shadow-xl border border-gray-800 z-20">
+                                    <Link
+                                        href={user.type === 'competitor'
+                                            ? `/profile/${user.data.walletAddress}`
+                                            : '/host/dashboard'
+                                        }
+                                        className="block px-4 py-2 text-gray-300 hover:bg-gray-800 transition-colors"
+                                        onClick={() => setShowProfileMenu(false)}
+                                    >
+                                        Profile
+                                    </Link>
+                                    <button
+                                        onClick={async () => {
+                                            await logout();
+                                            setShowProfileMenu(false);
+                                            router.push('/');
+                                        }}
+                                        className="block w-full text-left px-4 py-2 text-gray-300 hover:bg-gray-800 transition-colors"
+                                    >
+                                        Logout
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <button
+                            onClick={() => setShowChoiceModal(true)}
+                            className="px-6 py-2 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-md text-white"
+                        >
+                            Connect
+                        </button>
+                    )}
                 </div>
             </div>
 

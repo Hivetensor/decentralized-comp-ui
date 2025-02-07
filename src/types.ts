@@ -39,6 +39,12 @@ export interface Host {
     contactName: string;
     status: 'pending' | 'approved';
     createdAt: string;
+    competitions?: Array<{
+        id: number;
+        title: string;
+        status: 'active' | 'completed';
+        joinedAt: string;
+    }>;
 }
 
 export type AuthUser =

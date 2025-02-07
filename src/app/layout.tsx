@@ -5,6 +5,7 @@ import NavigationMenu from '@/components/NavigationMenu';
 import Footer from '@/components/Footer';
 import {Toaster} from '@/components/ui/toaster';
 import {AuthProvider} from "@/contexts/AuthContext";
+import React from "react";
 
 
 const geistSans = localFont({
