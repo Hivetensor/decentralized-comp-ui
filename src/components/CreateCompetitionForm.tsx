@@ -13,6 +13,7 @@ import {Calendar, Clock, FileText, Target, Trophy} from 'lucide-react';
 import {z} from "zod";
 import {api} from '@/services/api';
 import {toast} from "@/hooks/use-toast";
+import { useAuth } from '@/contexts/AuthContext';
 
 const competitionSchema = z.object({
     title: z.string()
@@ -44,13 +45,26 @@ const competitionSchema = z.object({
 });
 
 const CreateCompetitionForm = () => {
+    const {user} = useAuth();
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const [datasetFile, setDatasetFile] = useState<File | null>(null);
     const [fileError, setFileError] = useState<string | null>(null);
-
+    const [formData, setFormData] = useState({
+        title: '',
+        description: '',
+        prize: '',
+        difficulty: '',
+        startDate: '',
+        deadline: '',
+        datasetDescription: '',
+        evaluationMetric: '',
+        submissionFormat: '',
+        tags: [] as string[],
+        rules: [] as string[],
+    });
     const validateFile = (file: File) => {
         if (file.size > 100 * 1024 * 1024) { // 100MB
             return "File size must be less than 100MB";
@@ -78,11 +92,38 @@ const CreateCompetitionForm = () => {
         setError(null);
 
         try {
-            const hostEmail = Object.keys(localStorage).find(key => key.startsWith('host_'));
-            if (!hostEmail) throw new Error('Host not found');
+            if (!user || user.type !== 'host' || !user.data.id) {
+                throw new Error('Host ID not found');
+            }
+            const hostId = user.data.id;
 
-            const hostData = JSON.parse(localStorage.getItem(hostEmail) || '{}');
-            await api.hosts.createCompetition(hostData.id, formData, datasetFile);
+            const form = new FormData();
+
+            // Use state values to populate FormData
+            form.append('title', formData.title);
+            form.append('description', formData.description);
+            form.append('prize', formData.prize);
+            form.append('difficulty', formData.difficulty);
+            form.append('start_date', formData.startDate);
+            form.append('deadline', formData.deadline);
+            form.append('dataset_description', formData.datasetDescription);
+            form.append('evaluation_metric', formData.evaluationMetric);
+            form.append('submission_format', formData.submissionFormat);
+            form.append('status', 'Upcoming');
+
+            // Handle arrays
+            formData.tags.forEach(tag => {
+                form.append('tags', tag);
+            });
+
+            formData.rules.forEach(rule => {
+                form.append('rules', rule);
+            });
+
+            // Add the file
+            form.append('dataset_file', datasetFile);
+
+            await api.hosts.createCompetition(hostId, form);
 
             toast({
                 title: "Competition Created",
@@ -97,18 +138,7 @@ const CreateCompetitionForm = () => {
             setLoading(false);
         }
     };
-    const [formData, setFormData] = useState({
-        title: '',
-        description: '',
-        prize: '',
-        difficulty: '',
-        startDate: '',
-        endDate: '',
-        datasetDescription: '',
-        evaluationMetric: '',
-        submissionFormat: '',
-        rules: ''
-    });
+
 
     const validateForm = () => {
         try {
@@ -253,7 +283,7 @@ const CreateCompetitionForm = () => {
                                             className={`pl-10 bg-gray-700/50 border-gray-600 text-white ${
                                                 errors.endDate ? 'border-red-500' : ''
                                             }`}
-                                            value={formData.endDate}
+                                            value={formData.deadline}
                                             onChange={(e) => setFormData(prev => ({...prev, endDate: e.target.value}))}
                                         />
                                         {errors.endDate && (
@@ -356,7 +386,11 @@ const CreateCompetitionForm = () => {
                                     }`}
                                     placeholder="Enter competition rules (one per line)"
                                     value={formData.rules}
-                                    onChange={(e) => setFormData(prev => ({...prev, rules: e.target.value}))}
+                                    onChange={(e) => setFormData(prev => ({
+                                        ...prev,
+                                        rules: [...prev.rules, rules]
+                                    }))
+                                    }
                                 />
                                 {errors.rules && (
                                     <p className="text-red-400 text-sm mt-1">{errors.rules}</p>

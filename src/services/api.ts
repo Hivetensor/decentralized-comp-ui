@@ -7,7 +7,10 @@ const axiosInstance = axios.create({
         'Content-Type': 'application/json'
     }
 });
-
+const axiosFileInstance = axios.create({
+    baseURL: "http://localhost:8000",
+    withCredentials: true,
+});
 export const api = {
     users: {
         register: async (data: { username: string, walletAddress: string }) => {
@@ -66,6 +69,18 @@ export const api = {
         },
         getHostedCompetitions: async () => {
             const response = await axiosInstance.get('/api/v1/hosts/competitions');
+            return response.data;
+        },
+        createCompetition: async (hostId: number, data: FormData) => {
+            const response = await axiosFileInstance.post(
+                `/api/v1/hosts/${hostId}/create-competition`,
+                data,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
             return response.data;
         }
     },
