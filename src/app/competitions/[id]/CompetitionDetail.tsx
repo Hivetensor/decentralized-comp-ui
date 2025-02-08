@@ -18,7 +18,7 @@ import {Competition, LeaderboardEntry} from '@/types';
 const CompetitionDetail = () => {
     const params = useParams();
     const competitionId = Number(params.id);
-    const { user } = useAuth();
+    const {user} = useAuth();
     const router = useRouter();
 
     const [competition, setCompetition] = useState<Competition | null>(null);
@@ -153,7 +153,7 @@ const CompetitionDetail = () => {
         }
 
         try {
-            const { downloadUrl } = await api.competitions.getDatasetDownloadUrl(competitionId);
+            const {downloadUrl} = await api.competitions.getDatasetDownloadUrl(competitionId);
 
             // Create temporary link and trigger download
             window.open(downloadUrl, '_blank');
@@ -216,7 +216,8 @@ const CompetitionDetail = () => {
 
                         <div className="w-full md:w-auto">
                             {isUserInCompetition ? (
-                                <div className="text-green-400 font-medium bg-green-900/20 px-6 py-3 rounded-md border border-green-500/20">
+                                <div
+                                    className="text-green-400 font-medium bg-green-900/20 px-6 py-3 rounded-md border border-green-500/20">
                                     Already Joined
                                 </div>
                             ) : (

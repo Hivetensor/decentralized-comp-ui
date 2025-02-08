@@ -35,10 +35,10 @@ export default function RootLayout({
         <body>
         <AuthProvider>
             <AppWrapper>
-            <NavigationMenu/>
-            {children}
-            <Footer/>
-            <Toaster/>
+                <NavigationMenu/>
+                {children}
+                <Footer/>
+                <Toaster/>
             </AppWrapper>
         </AuthProvider>
         </body>

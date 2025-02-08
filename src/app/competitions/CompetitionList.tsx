@@ -1,19 +1,18 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from '@/components/ui/button';
-import { Trophy, Users, Play, Timer, Zap } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { api } from '@/services/api';
-import { Competition } from '@/types';
-import { useAuth } from '@/contexts/AuthContext';
-import { toast } from '@/hooks/use-toast';
+import React, {useEffect, useState} from 'react';
+import {Card, CardContent} from "@/components/ui/card";
+import {Badge} from "@/components/ui/badge";
+import {Button} from '@/components/ui/button';
+import {Play, Timer, Trophy, Users, Zap} from 'lucide-react';
+import {useRouter} from 'next/navigation';
+import {api} from '@/services/api';
+import {Competition} from '@/types';
+import {useAuth} from '@/contexts/AuthContext';
 
 const CompetitionList = () => {
     const router = useRouter();
-    const { user } = useAuth();
+    const {user} = useAuth();
     const [competitions, setCompetitions] = useState<Competition[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -52,7 +51,8 @@ const CompetitionList = () => {
         <div className="min-h-screen bg-black text-white">
             <div className="max-w-7xl mx-auto p-6 space-y-6">
                 {competitions.map((competition) => (
-                    <Card key={competition.id} className="bg-gray-900 border-gray-800 hover:border-purple-500 transition-all duration-300">
+                    <Card key={competition.id}
+                          className="bg-gray-900 border-gray-800 hover:border-purple-500 transition-all duration-300">
                         <CardContent className="p-6">
                             <div className="flex flex-col md:flex-row justify-between">
                                 <div className="flex-1">

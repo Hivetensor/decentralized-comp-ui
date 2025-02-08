@@ -13,7 +13,7 @@ import {Calendar, Clock, FileText, Target, Trophy} from 'lucide-react';
 import {z} from "zod";
 import {api} from '@/services/api';
 import {toast} from "@/hooks/use-toast";
-import { useAuth } from '@/contexts/AuthContext';
+import {useAuth} from '@/contexts/AuthContext';
 
 const competitionSchema = z.object({
     title: z.string()

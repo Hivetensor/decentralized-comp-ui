@@ -1,9 +1,9 @@
 // components/ProtectedRoute.tsx
 'use client';
 
-import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
-import React, { useEffect } from 'react';
+import {useAuth} from '@/contexts/AuthContext';
+import {useRouter} from 'next/navigation';
+import React, {useEffect} from 'react';
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
@@ -16,7 +16,7 @@ export function ProtectedRoute({
                                    requiresHost = false,
                                    requiresCompetitor = false
                                }: ProtectedRouteProps) {
-    const { user, isLoading } = useAuth();
+    const {user, isLoading} = useAuth();
     const router = useRouter();
 
     useEffect(() => {
@@ -40,7 +40,7 @@ export function ProtectedRoute({
 
     if (isLoading) {
         return <div className="min-h-screen flex items-center justify-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-500" />
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-500"/>
         </div>;
     }
 

@@ -1,15 +1,15 @@
 'use client';
 
 import React, {useState} from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { HostRegistrationModal } from '@/components/HostRegistrationModal';
-import { toast } from '@/hooks/use-toast';
+import {useRouter} from 'next/navigation';
+import {useAuth} from '@/contexts/AuthContext';
+import {Button} from '@/components/ui/button';
+import {HostRegistrationModal} from '@/components/HostRegistrationModal';
+import {toast} from '@/hooks/use-toast';
 
 const HomePage = () => {
     const router = useRouter();
-    const { user, login } = useAuth();
+    const {user, login} = useAuth();
     const [showHostRegistration, setShowHostRegistration] = useState(false);
 
     const handleJoinClick = () => {

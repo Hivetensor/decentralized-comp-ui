@@ -1,9 +1,9 @@
 'use client';
 
-import { useAuth } from '@/contexts/AuthContext';
+import {useAuth} from '@/contexts/AuthContext';
 
-export function AppWrapper({children}: {children: React.ReactNode}) {
-    const { isLoading } = useAuth();
+export function AppWrapper({children}: { children: React.ReactNode }) {
+    const {isLoading} = useAuth();
 
     if (isLoading) {
         return (

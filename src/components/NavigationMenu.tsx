@@ -8,12 +8,12 @@ import {UserRegistrationModal} from '@/components/UserRegistrationModal';
 import {HostRegistrationModal} from '@/components/HostRegistrationModal';
 import {RegistrationChoiceModal} from '@/components/RegistrationChoiceModal';
 import {toast} from '@/hooks/use-toast';
-import { User } from 'lucide-react';
+import {User} from 'lucide-react';
 
 
 const NavigationMenu = () => {
     const router = useRouter();
-    const { user, register, login, logout } = useAuth();
+    const {user, register, login, logout} = useAuth();
     const [showChoiceModal, setShowChoiceModal] = useState(false);
     const [showCompetitorRegistration, setShowCompetitorRegistration] = useState(false);
     const [showHostRegistration, setShowHostRegistration] = useState(false);
@@ -72,7 +72,8 @@ const NavigationMenu = () => {
                     {/* Logo */}
                     <div className="flex-shrink-0">
                         <Link href="/" className="flex items-center">
-                            <span className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
+                            <span
+                                className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
                                 HiveTensor
                             </span>
                         </Link>
@@ -101,11 +102,12 @@ const NavigationMenu = () => {
                                 onClick={() => setShowProfileMenu(!showProfileMenu)}
                                 className="p-2 rounded-full hover:bg-gray-800 transition-colors"
                             >
-                                <User className="h-6 w-6 text-gray-300" />
+                                <User className="h-6 w-6 text-gray-300"/>
                             </button>
 
                             {showProfileMenu && (
-                                <div className="absolute right-0 mt-2 w-48 py-2 bg-gray-900 rounded-md shadow-xl border border-gray-800 z-20">
+                                <div
+                                    className="absolute right-0 mt-2 w-48 py-2 bg-gray-900 rounded-md shadow-xl border border-gray-800 z-20">
                                     <Link
                                         href={user.type === 'competitor'
                                             ? `/profile/${user.data.walletAddress}`

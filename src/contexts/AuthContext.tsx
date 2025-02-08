@@ -19,7 +19,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({children}: { children: React.ReactNode }) {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -28,7 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setIsLoading(true);
             const response = await api.users.getProfile();
             if (response) {
-                setUser({ type: 'competitor', data: response });
+                setUser({type: 'competitor', data: response});
                 return;
             }
         } catch (error) {
@@ -36,7 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 try {
                     const hostResponse = await api.hosts.getProfile();
                     if (hostResponse) {
-                        setUser({ type: 'host', data: hostResponse });
+                        setUser({type: 'host', data: hostResponse});
                         return;
                     }
                 } catch (hostError) {
@@ -55,11 +55,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const login = {
         competitor: async (username: string, walletAddress: string) => {
-            await api.users.login({ username, walletAddress });
+            await api.users.login({username, walletAddress});
             await checkSession();
         },
         host: async (email: string, organization: string, contactName: string) => {
-            await api.hosts.login({ email, organization, contactName });
+            await api.hosts.login({email, organization, contactName});
             await checkSession();
         }
     };
