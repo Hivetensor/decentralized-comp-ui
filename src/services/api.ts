@@ -26,7 +26,10 @@ export const api = {
         },
         getProfile: async () => {
             const response = await axiosInstance.get('/api/v1/users/profile');
-            return response.data;
+            return {
+                ...response.data,
+                walletAddress: response.data.wallet_address,
+            };
         },
         logout: async () => {
             const response = await axiosInstance.post('/api/v1/users/logout');
@@ -56,10 +59,31 @@ export const api = {
         },
         getProfile: async () => {
             const response = await axiosInstance.get('/api/v1/hosts/profile');
-            return response.data;
+            return {
+                ...response.data,
+                ContactName: response.data.contact_name,
+            };
         },
         getHostedCompetitions: async () => {
             const response = await axiosInstance.get('/api/v1/hosts/competitions');
+            return response.data;
+        }
+    },
+    competitions: {
+        getAll: async () => {
+            const response = await axiosInstance.get('/api/v1/competitions/');
+            return response.data;
+        },
+        getOne: async (id: number) => {
+            const response = await axiosInstance.get(`/api/v1/competitions/${id}`);
+            return response.data;
+        },
+        getLeaderboard: async (id: number) => {
+            const response = await axiosInstance.get(`/api/v1/competitions/${id}/leaderboard`);
+            return response.data;
+        },
+        getDatasetDownloadUrl: async (id: number) => {
+            const response = await axiosInstance.get(`/api/v1/competitions/${id}/dataset-download-url`);
             return response.data;
         }
     }

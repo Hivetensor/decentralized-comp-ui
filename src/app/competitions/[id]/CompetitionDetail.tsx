@@ -1,19 +1,19 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Play, Timer, Trophy, Users } from 'lucide-react';
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { UserRegistrationModal } from '@/components/UserRegistrationModal';
-import { useAuth } from '@/contexts/AuthContext';
-import { api } from '@/services/api';
-import { toast } from '@/hooks/use-toast';
+import React, {useEffect, useState} from 'react';
+import {useParams, useRouter} from 'next/navigation';
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Badge} from "@/components/ui/badge";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import {Loader2, Play, Timer, Trophy, Users} from 'lucide-react';
+import {Alert, AlertDescription} from "@/components/ui/alert";
+import {Button} from "@/components/ui/button";
+import {UserRegistrationModal} from '@/components/UserRegistrationModal';
+import {useAuth} from '@/contexts/AuthContext';
+import {api} from '@/services/api';
+import {toast} from '@/hooks/use-toast';
 import LeaderboardComponent from './LeaderboardComponent';
-import { Competition, LeaderboardEntry } from '@/types';
+import {Competition, LeaderboardEntry} from '@/types';
 
 const CompetitionDetail = () => {
     const params = useParams();
@@ -90,6 +90,11 @@ const CompetitionDetail = () => {
 
     const handleJoinClick = async () => {
         if (!user) {
+            toast({
+                title: "Authentication Required",
+                description: "Please register to join competitions",
+                variant: "destructive",
+            });
             setShowRegistrationModal(true);
             return;
         }
@@ -103,14 +108,16 @@ const CompetitionDetail = () => {
             return;
         }
 
-        try {
-            await handleJoinCompetition(user.data.walletAddress);
-        } catch (error) {
-            toast({
-                title: "Failed to join competition",
-                description: error instanceof Error ? error.message : "Please try again",
-                variant: "destructive",
-            });
+        if (user.type == 'competitor') {
+            try {
+                await handleJoinCompetition(user.data.walletAddress);
+            } catch (error) {
+                toast({
+                    title: "Failed to join competition",
+                    description: error instanceof Error ? error.message : "Please try again",
+                    variant: "destructive",
+                });
+            }
         }
     };
 
