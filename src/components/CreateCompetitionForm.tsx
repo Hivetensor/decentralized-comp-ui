@@ -24,12 +24,12 @@ const competitionSchema = z.object({
         .max(5000, "Description too long"),
     prize: z.string()
         .regex(/^\d+(\.\d+)?\s*TAO$/, "Prize must be a number followed by TAO"),
-    difficulty: z.enum(["beginner", "intermediate", "advanced", "expert"], {
+    difficulty: z.enum(["Beginner", "Intermediate", "Advanced", "Expert"], {
         required_error: "Please select a difficulty level"
     }),
     startDate: z.string()
         .refine(date => new Date(date) > new Date(), "Start date must be in the future"),
-    endDate: z.string()
+    deadline: z.string()
         .refine(date => new Date(date) > new Date(), "End date must be in the future"),
     datasetDescription: z.string()
         .min(20, "Dataset description must be at least 20 characters"),
@@ -37,11 +37,11 @@ const competitionSchema = z.object({
         .min(5, "Please provide evaluation metric"),
     submissionFormat: z.string()
         .min(20, "Please provide detailed submission format"),
-    rules: z.string()
-        .min(20, "Please provide competition rules")
-}).refine(data => new Date(data.endDate) > new Date(data.startDate), {
+    tags: z.array(z.string()),
+    rules: z.array(z.string()),
+}).refine(data => new Date(data.deadline) > new Date(data.startDate), {
     message: "End date must be after start date",
-    path: ["endDate"]
+    path: ["deadline"]
 });
 
 const CreateCompetitionForm = () => {
@@ -238,10 +238,10 @@ const CreateCompetitionForm = () => {
                                             <SelectValue placeholder="Select difficulty"/>
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="beginner">Beginner</SelectItem>
-                                            <SelectItem value="intermediate">Intermediate</SelectItem>
-                                            <SelectItem value="advanced">Advanced</SelectItem>
-                                            <SelectItem value="expert">Expert</SelectItem>
+                                            <SelectItem value="Beginner">Beginner</SelectItem>
+                                            <SelectItem value="Intermediate">Intermediate</SelectItem>
+                                            <SelectItem value="Advanced">Advanced</SelectItem>
+                                            <SelectItem value="Expert">Expert</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     {errors.difficulty && (
@@ -281,13 +281,13 @@ const CreateCompetitionForm = () => {
                                             type="date"
                                             required
                                             className={`pl-10 bg-gray-700/50 border-gray-600 text-white ${
-                                                errors.endDate ? 'border-red-500' : ''
+                                                errors.deadline ? 'border-red-500' : ''
                                             }`}
                                             value={formData.deadline}
-                                            onChange={(e) => setFormData(prev => ({...prev, endDate: e.target.value}))}
+                                            onChange={(e) => setFormData(prev => ({...prev, deadline: e.target.value}))}
                                         />
-                                        {errors.endDate && (
-                                            <p className="text-red-400 text-sm mt-1">{errors.endDate}</p>
+                                        {errors.deadline && (
+                                            <p className="text-red-400 text-sm mt-1">{errors.deadline}</p>
                                         )}
                                     </div>
                                 </div>
@@ -377,6 +377,27 @@ const CreateCompetitionForm = () => {
                                 )}
                             </div>
 
+                            {/* Tags Input */}
+                            <div className="space-y-2">
+                                <Label className="text-gray-200">Tags</Label>
+                                <Textarea
+                                    required
+                                    className={`bg-gray-700/50 border-gray-600 text-white min-h-[100px] ${
+                                        errors.tags ? 'border-red-500' : ''
+                                    }`}
+                                    placeholder="Enter tags (one per line)"
+                                    value={formData.tags.join('\n')}
+                                    onChange={(e) => setFormData(prev => ({
+                                        ...prev,
+                                        tags: e.target.value.split('\n').filter(tag => tag.trim() !== '')
+                                    }))}
+                                />
+                                {errors.tags && (
+                                    <p className="text-red-400 text-sm mt-1">{errors.tags}</p>
+                                )}
+                            </div>
+
+                            {/* Rules Input */}
                             <div className="space-y-2">
                                 <Label className="text-gray-200">Rules</Label>
                                 <Textarea
@@ -385,18 +406,16 @@ const CreateCompetitionForm = () => {
                                         errors.rules ? 'border-red-500' : ''
                                     }`}
                                     placeholder="Enter competition rules (one per line)"
-                                    value={formData.rules}
+                                    value={formData.rules.join('\n')}
                                     onChange={(e) => setFormData(prev => ({
                                         ...prev,
-                                        rules: [...prev.rules, rules]
-                                    }))
-                                    }
+                                        rules: e.target.value.split('\n').filter(rule => rule.trim() !== '')
+                                    }))}
                                 />
                                 {errors.rules && (
                                     <p className="text-red-400 text-sm mt-1">{errors.rules}</p>
                                 )}
                             </div>
-
                             {error && (
                                 <Alert variant="destructive" className="bg-red-900/20 border-red-900">
                                     <AlertDescription>{error}</AlertDescription>

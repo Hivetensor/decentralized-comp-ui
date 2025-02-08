@@ -34,6 +34,7 @@ export interface User {
 }
 
 export interface Host {
+    id: number;
     email: string;
     organization: string;
     contactName: string;
