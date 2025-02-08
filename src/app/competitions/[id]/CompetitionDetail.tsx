@@ -61,6 +61,7 @@ const CompetitionDetail = () => {
                 variant: "success",
             });
             router.refresh();
+            window.location.reload();
         } catch (error) {
             throw new Error(error instanceof Error ? error.message : "Failed to join competition");
         }
@@ -111,6 +112,7 @@ const CompetitionDetail = () => {
         if (user.type == 'competitor') {
             try {
                 await handleJoinCompetition(user.data.walletAddress);
+
             } catch (error) {
                 toast({
                     title: "Failed to join competition",
@@ -154,12 +156,7 @@ const CompetitionDetail = () => {
             const { downloadUrl } = await api.competitions.getDatasetDownloadUrl(competitionId);
 
             // Create temporary link and trigger download
-            const link = document.createElement('a');
-            link.href = downloadUrl;
-            link.download = `dataset-${competitionId}`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            window.open(downloadUrl, '_blank');
 
             toast({
                 title: "Download Started",

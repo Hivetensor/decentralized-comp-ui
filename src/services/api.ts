@@ -84,7 +84,10 @@ export const api = {
         },
         getDatasetDownloadUrl: async (id: number) => {
             const response = await axiosInstance.get(`/api/v1/competitions/${id}/dataset-download-url`);
-            return response.data;
+            return {
+                ...response.data,
+                downloadUrl: response.data.download_url,
+            };
         }
     }
 };
