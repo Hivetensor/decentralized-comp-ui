@@ -1,140 +1,66 @@
-// services/api.ts
-import { API_CONFIG } from '@/config/api';
+import axios from "axios";
 
-const makeRequest = async (endpoint: string, options: RequestInit = {}) => {
-    const response = await fetch(`${API_CONFIG.BASE_URL}${endpoint}`, {
-        ...options,
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers,
-        }
-    });
-
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({ detail: 'An error occurred' }));
-        throw new Error(error.detail || 'Request failed');
+const axiosInstance = axios.create({
+    baseURL: "http://localhost:8000",  // Important: using localhost, not 127.0.0.1
+    withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json'
     }
-
-    return response.json();
-};
+});
 
 export const api = {
     users: {
         register: async (data: { username: string, walletAddress: string }) => {
-            return makeRequest('/api/v1/users/register', {
-                method: 'POST',
-                body: JSON.stringify(
-                    {
-                        username: data.username,
-                        wallet_address:data.walletAddress,
-                    }
-                )
+            const response = await axiosInstance.post('/api/v1/users/register', {
+                username: data.username,
+                wallet_address: data.walletAddress,
             });
+            return response.data;
         },
-
-        login: async (data: { username: string; walletAddress: string }) => {
-            return makeRequest('/api/v1/users/login', {
-                method: 'POST',
-                body: JSON.stringify(
-                    {
-                        username: data.username,
-                        wallet_address:data.walletAddress,
-                    }
-                )
+        login: async (data: { username: string, walletAddress: string }) => {
+            const response = await axiosInstance.post('/api/v1/users/login', {
+                username: data.username,
+                wallet_address: data.walletAddress,
             });
+            return response.data;
         },
-
         getProfile: async () => {
-            return makeRequest('/api/v1/users/profile');
+            const response = await axiosInstance.get('/api/v1/users/profile');
+            return response.data;
         },
-
         logout: async () => {
-            return makeRequest('/api/v1/users/logout', {
-                method: 'POST'
-            });
+            const response = await axiosInstance.post('/api/v1/users/logout');
+            return response.data;
         },
-
         registerForCompetition: async (walletAddress: string, competitionId: number) => {
-            return makeRequest(`/api/v1/users/${walletAddress}/${competitionId}/register`, {
-                method: 'POST'
-            });
-        },
+            const response = await axiosInstance.post(`/api/v1/users/${walletAddress}/${competitionId}/register`);
+            return response.data;
+        }
     },
-
     hosts: {
         register: async (data: { email: string, organization: string, contactName: string }) => {
-            return makeRequest('/api/v1/hosts/register', {
-                method: 'POST',
-                body: JSON.stringify(
-                    {
-                        email: data.email,
-                        organization: data.organization,
-                        contact_name: data.contactName,
-                    }
-                )
+            const response = await axiosInstance.post('/api/v1/hosts/register', {
+                email: data.email,
+                organization: data.organization,
+                contact_name: data.contactName
             });
+            return response.data;
         },
-
-        login: async (data: { email: string; organization: string; contactName: string }) => {
-            return makeRequest('/api/v1/hosts/login', {
-                method: 'POST',
-                body: JSON.stringify(
-                    {
-                        email: data.email,
-                        organization: data.organization,
-                        contact_name: data.contactName,
-                    }
-                )
+        login: async (data: { email: string, organization: string, contactName: string }) => {
+            const response = await axiosInstance.post('/api/v1/hosts/login', {
+                email: data.email,
+                organization: data.organization,
+                contact_name: data.contactName
             });
+            return response.data;
         },
-
         getProfile: async () => {
-            return makeRequest('/api/v1/hosts/profile');
+            const response = await axiosInstance.get('/api/v1/hosts/profile');
+            return response.data;
         },
-
-        createCompetition: async (competitionData: any, datasetFile: File) => {
-            const formData = new FormData();
-
-            Object.keys(competitionData).forEach(key => {
-                if (key === 'tags' || key === 'rules') {
-                    formData.append(key, JSON.stringify(competitionData[key]));
-                } else {
-                    formData.append(key, competitionData[key]);
-                }
-            });
-
-            formData.append('dataset_file', datasetFile);
-
-            const response = await fetch(`${API_CONFIG.BASE_URL}/api/v1/hosts/create-competition`, {
-                method: 'POST',
-                credentials: 'include',
-                body: formData,
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || 'Failed to create competition');
-            }
-            return response.json();
-        },
-    },
-
-    competitions: {
-        getAll: async () => {
-            return makeRequest('/api/v1/competitions/competitions');
-        },
-
-        getOne: async (id: number) => {
-            return makeRequest(`/api/v1/competitions/${id}`);
-        },
-
-        getLeaderboard: async (competitionId: number) => {
-            return makeRequest(`/api/v1/competitions/${competitionId}/leaderboard`);
-        },
-
-        getDatasetDownloadUrl: async (competitionId: number) => {
-            return makeRequest(`/api/v1/competitions/${competitionId}/dataset-download-url`);
+        getHostedCompetitions: async () => {
+            const response = await axiosInstance.get('/api/v1/hosts/competitions');
+            return response.data;
         }
     }
 };

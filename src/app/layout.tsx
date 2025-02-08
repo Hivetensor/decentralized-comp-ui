@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import {Toaster} from '@/components/ui/toaster';
 import {AuthProvider} from "@/contexts/AuthContext";
 import React from "react";
+import {AppWrapper} from "@/components/AppWrapper"
 
 
 const geistSans = localFont({
@@ -33,12 +34,15 @@ export default function RootLayout({
         </head>
         <body>
         <AuthProvider>
+            <AppWrapper>
             <NavigationMenu/>
             {children}
             <Footer/>
             <Toaster/>
+            </AppWrapper>
         </AuthProvider>
         </body>
         </html>
     );
+
 }

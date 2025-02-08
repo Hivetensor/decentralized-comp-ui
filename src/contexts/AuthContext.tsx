@@ -23,55 +23,55 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<AuthUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // contexts/AuthContext.tsx
-    useEffect(() => {
-        const checkSession = async () => {
-            try {
-                setIsLoading(true);
-                const response = await api.users.getProfile();
-                if (response) {
-                    setUser({ type: 'competitor', data: response });
-                }
-            } catch (userError) {
+    const checkSession = async () => {
+        try {
+            setIsLoading(true);
+            const response = await api.users.getProfile();
+            if (response) {
+                setUser({ type: 'competitor', data: response });
+                return;
+            }
+        } catch (error) {
+            if (error.response?.status === 404) {
                 try {
                     const hostResponse = await api.hosts.getProfile();
                     if (hostResponse) {
                         setUser({ type: 'host', data: hostResponse });
+                        return;
                     }
                 } catch (hostError) {
-                    setUser(null);
+                    // Do nothing, will set null below
                 }
-            } finally {
-                setIsLoading(false);
             }
-        };
+        } finally {
+            setIsLoading(false);
+        }
+        setUser(null);
+    };
 
+    useEffect(() => {
         checkSession();
     }, []);
+
     const login = {
         competitor: async (username: string, walletAddress: string) => {
-            const response = await api.users.login({ username, walletAddress });
-            const userData = await api.users.getProfile();
-            setUser({ type: 'competitor', data: userData });
+            await api.users.login({ username, walletAddress });
+            await checkSession();
         },
         host: async (email: string, organization: string, contactName: string) => {
-            const response = await api.hosts.login({ email, organization, contactName });
-            const hostData = await api.hosts.getProfile();
-            setUser({ type: 'host', data: hostData });
+            await api.hosts.login({ email, organization, contactName });
+            await checkSession();
         }
     };
 
     const register = {
         competitor: async (username: string, walletAddress: string) => {
             await api.users.register({username, walletAddress});
-            // After registration, automatically log them in
-            const userData = await api.users.login({username, walletAddress});
-            setUser({type: 'competitor', data: userData});
+            await checkSession();
         },
         host: async (email: string, organization: string, contactName: string) => {
             await api.hosts.register({email, organization, contactName});
-            const hostData = await api.hosts.login({email, organization, contactName});
-            setUser({type: 'host', data: hostData});
+            await checkSession();
         }
     };
 
