@@ -1,106 +1,110 @@
-import {API_CONFIG} from '@/config/api';
+import axios from "axios";
+import {API_CONFIG} from "@/config/api";
 
+const axiosInstance = axios.create({
+    // baseURL: "http://localhost:8000",  // Important: using localhost, not 127.0.0.1
+    baseURL: API_CONFIG.BASE_URL,
+    withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json'
+    }
+});
+const axiosFileInstance = axios.create({
+    baseURL: "http://localhost:8000",
+    withCredentials: true,
+});
 export const api = {
     users: {
         register: async (data: { username: string, walletAddress: string }) => {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/users/register`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(
-                    {
-                        username: data.username,
-                        wallet_address: data.walletAddress
-                    }
-                )
+            const response = await axiosInstance.post('/api/v1/users/register', {
+                username: data.username,
+                wallet_address: data.walletAddress,
             });
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || 'Registration failed');
-            }
-            return response.json();
+            return response.data;
         },
-
-        registerForCompetition: async (walletAddress: string, competitionId: number) => {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/users/${walletAddress}/${competitionId}/register`, {
-                method: 'POST'
+        login: async (data: { username: string, walletAddress: string }) => {
+            const response = await axiosInstance.post('/api/v1/users/login', {
+                username: data.username,
+                wallet_address: data.walletAddress,
             });
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || 'Competition registration failed');
-            }
-            return response.json();
+            return response.data;
+        },
+        getProfile: async () => {
+            const response = await axiosInstance.get('/api/v1/users/profile');
+            return {
+                ...response.data,
+                walletAddress: response.data.wallet_address,
+            };
+        },
+        logout: async () => {
+            const response = await axiosInstance.post('/api/v1/users/logout');
+            return response.data;
+        },
+        registerForCompetition: async (walletAddress: string, competitionId: number) => {
+            const response = await axiosInstance.post(`/api/v1/users/${walletAddress}/${competitionId}/register`);
+            return response.data;
         }
     },
-
     hosts: {
         register: async (data: { email: string, organization: string, contactName: string }) => {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/hosts/register`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(
-                    {
-                        email: data.email,
-                        organization: data.organization,
-                        contact_name: data.contactName
-                    }
-                )
+            const response = await axiosInstance.post('/api/v1/hosts/register', {
+                email: data.email,
+                organization: data.organization,
+                contact_name: data.contactName
             });
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || 'Host registration failed');
-            }
-            return response.json();
+            return response.data;
         },
-
-        createCompetition: async (hostId: number, data: any) => {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/hosts/${hostId}/create-competition`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
+        login: async (data: { email: string, organization: string, contactName: string }) => {
+            const response = await axiosInstance.post('/api/v1/hosts/login', {
+                email: data.email,
+                organization: data.organization,
+                contact_name: data.contactName
             });
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || 'Failed to create competition');
-            }
-            return response.json();
+            return response.data;
         },
-
-        getProfile: async (email: string) => {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/hosts/${email}`);
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || 'Failed to fetch host profile');
-            }
-            return response.json();
+        getProfile: async () => {
+            const response = await axiosInstance.get('/api/v1/hosts/profile');
+            return {
+                ...response.data,
+                ContactName: response.data.contact_name,
+            };
+        },
+        getHostedCompetitions: async () => {
+            const response = await axiosInstance.get('/api/v1/hosts/competitions');
+            return response.data;
+        },
+        createCompetition: async (hostId: number, data: FormData) => {
+            const response = await axiosFileInstance.post(
+                `/api/v1/hosts/${hostId}/create-competition`,
+                data,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
+            return response.data;
         }
     },
-
     competitions: {
         getAll: async () => {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/competitions/competitions`);
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || 'Failed to fetch competitions');
-            }
-            return response.json();
+            const response = await axiosInstance.get('/api/v1/competitions/');
+            return response.data;
         },
-
         getOne: async (id: number) => {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/competitions/${id}`);
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || 'Failed to fetch competition');
-            }
-            return response.json();
+            const response = await axiosInstance.get(`/api/v1/competitions/${id}`);
+            return response.data;
         },
-
-        getLeaderboard: async (competitionId: number) => {
-            const response = await fetch(`${API_CONFIG.BASE_URL}/competitions/${competitionId}/leaderboard`);
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.detail || 'Failed to fetch leaderboard');
-            }
-            return response.json();
+        getLeaderboard: async (id: number) => {
+            const response = await axiosInstance.get(`/api/v1/competitions/${id}/leaderboard`);
+            return response.data;
+        },
+        getDatasetDownloadUrl: async (id: number) => {
+            const response = await axiosInstance.get(`/api/v1/competitions/${id}/dataset-download-url`);
+            return {
+                ...response.data,
+                downloadUrl: response.data.download_url,
+            };
         }
     }
 };

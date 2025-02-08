@@ -3,8 +3,10 @@ import localFont from "next/font/local";
 import "./globals.css";
 import NavigationMenu from '@/components/NavigationMenu';
 import Footer from '@/components/Footer';
-import {UserProvider} from '@/contexts/UserContext';
 import {Toaster} from '@/components/ui/toaster';
+import {AuthProvider} from "@/contexts/AuthContext";
+import React from "react";
+import {AppWrapper} from "@/components/AppWrapper"
 
 
 const geistSans = localFont({
@@ -15,7 +17,7 @@ const geistSans = localFont({
 
 
 export const metadata: Metadata = {
-    title: "HiveTensor",
+    title: "Home | HiveTensor",
     description: "HiveTensor website",
 };
 
@@ -27,14 +29,20 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en" className={geistSans.className}>
+        <head>
+            <link rel="icon" href="/favicon.ico"/>
+        </head>
         <body>
-        <UserProvider>
-            <NavigationMenu/>
-            {children}
-            <Footer/>
-            <Toaster/>
-        </UserProvider>
+        <AuthProvider>
+            <AppWrapper>
+                <NavigationMenu/>
+                {children}
+                <Footer/>
+                <Toaster/>
+            </AppWrapper>
+        </AuthProvider>
         </body>
         </html>
     );
+
 }

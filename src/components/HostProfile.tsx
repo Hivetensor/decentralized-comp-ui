@@ -33,7 +33,7 @@ export default function HostProfile() {
         const fetchProfile = async () => {
             try {
                 setLoading(true);
-                const data = await api.hosts.getProfile(String(params.email));
+                const data = await api.hosts.getProfile();
                 setProfile(data);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to load profile');

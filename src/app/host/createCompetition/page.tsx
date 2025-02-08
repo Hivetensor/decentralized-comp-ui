@@ -1,5 +1,10 @@
 import CreateCompetitionForm from '@/components/CreateCompetitionForm';
+import {ProtectedRoute} from "@/components/ProtectedRoute";
 
 export default function CreateCompetitionPage() {
-    return <CreateCompetitionForm/>;
+    return (
+        <ProtectedRoute requiresHost>
+            <CreateCompetitionForm/>;
+        </ProtectedRoute>
+    );
 }
