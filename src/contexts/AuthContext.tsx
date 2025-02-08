@@ -1,5 +1,5 @@
 'use client';
-import {createContext, useContext, useEffect, useState} from 'react';
+import React, {createContext, useContext, useEffect, useState} from 'react';
 import {api} from '@/services/api';
 import {AuthUser} from "@/types";
 
@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 return;
             }
         } catch (error) {
-            if (error.response?.status === 404) {
+            if (error) {
                 try {
                     const hostResponse = await api.hosts.getProfile();
                     if (hostResponse) {
