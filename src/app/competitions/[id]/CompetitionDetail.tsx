@@ -15,6 +15,7 @@ import {toast} from '@/hooks/use-toast';
 import LeaderboardComponent from './LeaderboardComponent';
 import {Competition, LeaderboardEntry} from '@/types';
 import {Input} from "@/components/ui/input";
+import { Label } from '@/components/ui/label';
 
 const CompetitionDetail = () => {
     const params = useParams();
@@ -293,23 +294,6 @@ const CompetitionDetail = () => {
                                     <div className="text-green-400 font-medium bg-green-900/20 px-6 py-3 rounded-md border border-green-500/20">
                                         Already Joined
                                     </div>
-                                    {competition.requires_submission && (
-                                        <div className="space-y-3">
-                                            <Input
-                                                className="bg-gray-700/50 border-gray-600 text-white"
-                                                placeholder="Enter your HuggingFace submission URL"
-                                                value={submissionUrl}
-                                                onChange={(e) => setSubmissionUrl(e.target.value)}
-                                            />
-                                            <Button
-                                                onClick={handleSubmitSolution}
-                                                className="w-full bg-gradient-to-r from-purple-600 to-cyan-600"
-                                            >
-                                                <Upload className="w-4 h-4 mr-2"/>
-                                                Submit Solution
-                                            </Button>
-                                        </div>
-                                    )}
                                 </div>
                             ) : (
                                 user?.type !== 'host' && (
@@ -384,6 +368,14 @@ const CompetitionDetail = () => {
                         <TabsTrigger value="leaderboard" className="data-[state=active]:bg-purple-600/80 text-gray-200">
                             Leaderboard
                         </TabsTrigger>
+                        {competition.requires_submission && (
+                            <TabsTrigger value="submission"
+                                         className="data-[state=active]:bg-purple-600/80 text-gray-200">
+                                Submit Solution
+                            </TabsTrigger>
+                        )}
+
+
                     </TabsList>
 
                     <TabsContent value="overview" className="mt-6">
@@ -439,6 +431,64 @@ const CompetitionDetail = () => {
                     <TabsContent value="leaderboard" className="mt-6">
                         <LeaderboardComponent leaderboardData={leaderboard}/>
                     </TabsContent>
+
+                    {competition.requires_submission && (
+                        <TabsContent value="submission" className="mt-6">
+                            <Card className="bg-gray-800/50 border-gray-700">
+                                <CardHeader>
+                                    <CardTitle className="text-gray-100">Submit Your Solution</CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    {!isUserInCompetition ? (
+                                        <div className="text-center py-8">
+                                            <p className="text-gray-400 mb-4">
+                                                You need to join this competition before submitting a solution.
+                                            </p>
+                                            <Button
+                                                onClick={handleJoinClick}
+                                                className="bg-gradient-to-r from-purple-600 to-cyan-600"
+                                            >
+                                                Join Competition
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-6">
+                                            <div>
+                                                <p className="text-gray-300 mb-4">
+                                                    Please provide a link to your solution on HuggingFace. Make sure your repository:
+                                                </p>
+                                                <ul className="list-disc list-inside space-y-2 text-gray-400">
+                                                    <li>Contains all necessary code and documentation</li>
+                                                    <li>Is publicly accessible</li>
+                                                    <li>Follows the competition submission guidelines</li>
+                                                </ul>
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                <div className="space-y-2">
+                                                    <Label className="text-gray-200">HuggingFace Repository URL</Label>
+                                                    <Input
+                                                        className="bg-gray-700/50 border-gray-600 text-white"
+                                                        placeholder="https://huggingface.co/..."
+                                                        value={submissionUrl}
+                                                        onChange={(e) => setSubmissionUrl(e.target.value)}
+                                                    />
+                                                </div>
+                                                <Button
+                                                    onClick={handleSubmitSolution}
+                                                    className="w-full bg-gradient-to-r from-purple-600 to-cyan-600"
+                                                    disabled={!submissionUrl}
+                                                >
+                                                    <Upload className="w-4 h-4 mr-2"/>
+                                                    Submit Solution
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+                    )}
                 </Tabs>
             </div>
 
