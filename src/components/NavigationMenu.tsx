@@ -136,7 +136,7 @@ const NavigationMenu = () => {
                             onClick={() => setShowChoiceModal(true)}
                             className="px-6 py-2 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-md text-white"
                         >
-                            Connect
+                           Login / Register
                         </button>
                     )}
                 </div>
