@@ -23,7 +23,9 @@ const competitionSchema = z.object({
         .min(20, "Description must be at least 20 characters")
         .max(5000, "Description too long"),
     prize: z.string()
-        .regex(/^\d+(\.\d+)?\s*TAO$/, "Prize must be a number followed by TAO"),
+        .min(1, "Prize amount is required"),
+    prize_currency: z.string()
+        .min(1, "Prize currency is required"),
     difficulty: z.enum(["Beginner", "Intermediate", "Advanced", "Expert"], {
         required_error: "Please select a difficulty level"
     }),
@@ -39,9 +41,10 @@ const competitionSchema = z.object({
         .min(20, "Please provide detailed submission format"),
     tags: z.array(z.string()),
     rules: z.array(z.string()),
-}).refine(data => new Date(data.deadline) > new Date(data.startDate), {
-    message: "End date must be after start date",
-    path: ["deadline"]
+    requires_submission: z.boolean(),
+    has_external_wallet: z.boolean(),
+    wallet_address: z.string().optional()
+        .refine(value => !value || value.length > 0, "Wallet address is required when external wallet is enabled"),
 });
 
 const CreateCompetitionForm = () => {
@@ -56,6 +59,7 @@ const CreateCompetitionForm = () => {
         title: '',
         description: '',
         prize: '',
+        prize_currency: 'TAO',
         difficulty: '',
         startDate: '',
         deadline: '',
@@ -64,7 +68,11 @@ const CreateCompetitionForm = () => {
         submissionFormat: '',
         tags: [] as string[],
         rules: [] as string[],
+        requires_submission: false,
+        has_external_wallet: false,
+        wallet_address: '',
     });
+
     const validateFile = (file: File) => {
         if (file.size > 100 * 1024 * 1024) { // 100MB
             return "File size must be less than 100MB";
@@ -103,6 +111,7 @@ const CreateCompetitionForm = () => {
             form.append('title', formData.title);
             form.append('description', formData.description);
             form.append('prize', formData.prize);
+            form.append('prize_currency', formData.prize_currency);
             form.append('difficulty', formData.difficulty);
             form.append('start_date', formData.startDate);
             form.append('deadline', formData.deadline);
@@ -110,6 +119,11 @@ const CreateCompetitionForm = () => {
             form.append('evaluation_metric', formData.evaluationMetric);
             form.append('submission_format', formData.submissionFormat);
             form.append('status', 'Upcoming');
+            form.append('requires_submission', String(formData.requires_submission));
+            form.append('has_external_wallet', String(formData.has_external_wallet));
+            if (formData.has_external_wallet && formData.wallet_address) {
+                form.append('wallet_address', formData.wallet_address);
+            }
 
             // Handle arrays
             formData.tags.forEach(tag => {
@@ -138,7 +152,6 @@ const CreateCompetitionForm = () => {
             setLoading(false);
         }
     };
-
 
     const validateForm = () => {
         try {
@@ -208,7 +221,7 @@ const CreateCompetitionForm = () => {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label className="text-gray-200">Prize Pool</Label>
+                                    <Label className="text-gray-200">Prize Amount</Label>
                                     <div className="relative">
                                         <Trophy className="absolute left-3 top-3 h-4 w-4 text-gray-400"/>
                                         <Input
@@ -216,7 +229,7 @@ const CreateCompetitionForm = () => {
                                             className={`pl-10 bg-gray-700/50 border-gray-600 text-white ${
                                                 errors.prize ? 'border-red-500' : ''
                                             }`}
-                                            placeholder="e.g., 50000 TAO"
+                                            placeholder="e.g., 50000"
                                             value={formData.prize}
                                             onChange={(e) => setFormData(prev => ({...prev, prize: e.target.value}))}
                                         />
@@ -227,27 +240,46 @@ const CreateCompetitionForm = () => {
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label className="text-gray-200">Difficulty Level</Label>
-                                    <Select
-                                        value={formData.difficulty}
-                                        onValueChange={(value) => setFormData(prev => ({...prev, difficulty: value}))}
-                                    >
-                                        <SelectTrigger className={`bg-gray-700/50 border-gray-600 text-white ${
-                                            errors.difficulty ? 'border-red-500' : ''
-                                        }`}>
-                                            <SelectValue placeholder="Select difficulty"/>
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="Beginner">Beginner</SelectItem>
-                                            <SelectItem value="Intermediate">Intermediate</SelectItem>
-                                            <SelectItem value="Advanced">Advanced</SelectItem>
-                                            <SelectItem value="Expert">Expert</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    {errors.difficulty && (
-                                        <p className="text-red-400 text-sm mt-1">{errors.difficulty}</p>
+                                    <Label className="text-gray-200">Prize Currency</Label>
+                                    <Input
+                                        required
+                                        className={`bg-gray-700/50 border-gray-600 text-white ${
+                                            errors.prize_currency ? 'border-red-500' : ''
+                                        }`}
+                                        placeholder="e.g., TAO, BTC"
+                                        value={formData.prize_currency}
+                                        onChange={(e) => setFormData(prev => ({
+                                            ...prev,
+                                            prize_currency: e.target.value
+                                        }))}
+                                    />
+                                    {errors.prize_currency && (
+                                        <p className="text-red-400 text-sm mt-1">{errors.prize_currency}</p>
                                     )}
                                 </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label className="text-gray-200">Difficulty Level</Label>
+                                <Select
+                                    value={formData.difficulty}
+                                    onValueChange={(value) => setFormData(prev => ({...prev, difficulty: value}))}
+                                >
+                                    <SelectTrigger className={`bg-gray-700/50 border-gray-600 text-white ${
+                                        errors.difficulty ? 'border-red-500' : ''
+                                    }`}>
+                                        <SelectValue placeholder="Select difficulty"/>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Beginner">Beginner</SelectItem>
+                                        <SelectItem value="Intermediate">Intermediate</SelectItem>
+                                        <SelectItem value="Advanced">Advanced</SelectItem>
+                                        <SelectItem value="Expert">Expert</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                {errors.difficulty && (
+                                    <p className="text-red-400 text-sm mt-1">{errors.difficulty}</p>
+                                )}
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -377,6 +409,59 @@ const CreateCompetitionForm = () => {
                                 )}
                             </div>
 
+                            <div className="flex items-center gap-4 my-4">
+                                <div className="flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        id="requires_submission"
+                                        className="mr-2"
+                                        checked={formData.requires_submission}
+                                        onChange={(e) => setFormData(prev => ({
+                                            ...prev,
+                                            requires_submission: e.target.checked
+                                        }))}
+                                    />
+                                    <Label htmlFor="requires_submission" className="text-gray-200">
+                                        Requires HuggingFace Submission
+                                    </Label>
+                                </div>
+
+                                <div className="flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        id="has_external_wallet"
+                                        className="mr-2"
+                                        checked={formData.has_external_wallet}
+                                        onChange={(e) => setFormData(prev => ({
+                                            ...prev,
+                                            has_external_wallet: e.target.checked
+                                        }))}
+                                    />
+                                    <Label htmlFor="has_external_wallet" className="text-gray-200">
+                                        Accept External Contributions
+                                    </Label>
+                                </div>
+                            </div>
+
+                            {formData.has_external_wallet && (
+                                <div className="space-y-2">
+                                    <Label className="text-gray-200">Wallet Address</Label>
+                                    <Input
+                                        required
+                                        className="bg-gray-700/50 border-gray-600 text-white"
+                                        placeholder="Enter wallet address for contributions"
+                                        value={formData.wallet_address}
+                                        onChange={(e) => setFormData(prev => ({
+                                            ...prev,
+                                            wallet_address: e.target.value
+                                        }))}
+                                    />
+                                    {errors.wallet_address && (
+                                        <p className="text-red-400 text-sm mt-1">{errors.wallet_address}</p>
+                                    )}
+                                </div>
+                            )}
+
                             {/* Tags Input */}
                             <div className="space-y-2">
                                 <Label className="text-gray-200">Tags</Label>
@@ -416,6 +501,7 @@ const CreateCompetitionForm = () => {
                                     <p className="text-red-400 text-sm mt-1">{errors.rules}</p>
                                 )}
                             </div>
+
                             {error && (
                                 <Alert variant="destructive" className="bg-red-900/20 border-red-900">
                                     <AlertDescription>{error}</AlertDescription>

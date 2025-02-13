@@ -105,6 +105,13 @@ export const api = {
                 ...response.data,
                 downloadUrl: response.data.download_url,
             };
-        }
+        },
+        submit: async (competitionId: number, data: { url: string }) => {
+            const response = await axiosInstance.post(
+                `/api/v1/competitions/${competitionId}/submit`,
+                data
+            );
+            return response.data;
+        },
     }
 };
