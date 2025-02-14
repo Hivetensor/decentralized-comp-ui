@@ -3,6 +3,7 @@ export interface Competition {
     title: string;
     description: string;
     prize: string;
+    prize_currency: string;
     participants: number;
     start_date: string;
     deadline: string;
@@ -10,6 +11,9 @@ export interface Competition {
     status: 'Active' | 'Upcoming' | 'Completed';
     tags: string[];
     rules: string[];
+    requires_submission: boolean;
+    has_external_wallet: boolean; // new field
+    wallet_address?: string;
 }
 
 export interface LeaderboardEntry {

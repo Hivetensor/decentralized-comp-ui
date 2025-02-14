@@ -1,22 +1,20 @@
-// components/RegistrationChoiceModal.tsx
+// components/LoginChoiceModal.tsx
 import React from 'react';
 import {X} from 'lucide-react';
 
-interface RegistrationChoiceModalProps {
+interface LoginChoiceModalProps {
     isOpen: boolean;
     onClose: () => void;
     onChooseCompetitor: () => void;
     onChooseHost: () => void;
-    onSwitchToLogin: () => void;
 }
 
-export const RegistrationChoiceModal = ({
-                                            isOpen,
-                                            onClose,
-                                            onChooseCompetitor,
-                                            onChooseHost,
-                                            onSwitchToLogin,
-                                        }: RegistrationChoiceModalProps) => {
+export const LoginChoiceModal = ({
+                                     isOpen,
+                                     onClose,
+                                     onChooseCompetitor,
+                                     onChooseHost
+                                 }: LoginChoiceModalProps) => {
     if (!isOpen) return null;
 
     return (
@@ -24,7 +22,7 @@ export const RegistrationChoiceModal = ({
             <div className="bg-gray-900 rounded-lg max-w-md w-full border border-gray-800">
                 <div className="flex items-center justify-between p-6 border-b border-gray-800">
                     <h2 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
-                        Choose Registration Type
+                        Login
                     </h2>
                     <button onClick={onClose} className="text-gray-400 hover:text-white">
                         <X className="h-5 w-5"/>
@@ -36,29 +34,17 @@ export const RegistrationChoiceModal = ({
                         onClick={onChooseCompetitor}
                         className="w-full p-4 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 rounded-lg text-white transition-all"
                     >
-                        <h3 className="text-lg font-semibold">Register as Competitor</h3>
-                        <p className="text-sm text-gray-200">Join competitions and submit solutions</p>
+                        <h3 className="text-lg font-semibold">Login as Competitor</h3>
+                        <p className="text-sm text-gray-200">Access your competitions</p>
                     </button>
 
                     <button
                         onClick={onChooseHost}
                         className="w-full p-4 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 rounded-lg text-white transition-all"
                     >
-                        <h3 className="text-lg font-semibold">Register as Host</h3>
-                        <p className="text-sm text-gray-200">Create and manage competitions</p>
+                        <h3 className="text-lg font-semibold">Login as Host</h3>
+                        <p className="text-sm text-gray-200">Manage your competitions</p>
                     </button>
-
-                    <div className="text-center pt-4 border-t border-gray-800">
-                        <p className="text-sm text-gray-400">
-                            Already registered?{' '}
-                            <button
-                                onClick={onSwitchToLogin}
-                                className="text-purple-400 hover:text-purple-300 font-medium"
-                            >
-                                Click here to login
-                            </button>
-                        </p>
-                    </div>
                 </div>
             </div>
         </div>
