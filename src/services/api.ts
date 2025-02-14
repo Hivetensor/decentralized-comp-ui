@@ -2,7 +2,6 @@ import axios from "axios";
 import {API_CONFIG} from "@/config/api";
 
 const axiosInstance = axios.create({
-    // baseURL: "http://localhost:8000",  // Important: using localhost, not 127.0.0.1
     baseURL: API_CONFIG.BASE_URL,
     withCredentials: true,
     headers: {
@@ -10,7 +9,7 @@ const axiosInstance = axios.create({
     }
 });
 const axiosFileInstance = axios.create({
-    baseURL: "http://localhost:8000",
+    baseURL: API_CONFIG.BASE_URL,
     withCredentials: true,
 });
 export const api = {
