@@ -9,6 +9,9 @@ import {HostRegistrationModal} from '@/components/HostRegistrationModal';
 import {RegistrationChoiceModal} from '@/components/RegistrationChoiceModal';
 import {toast} from '@/hooks/use-toast';
 import {User} from 'lucide-react';
+import {LoginChoiceModal} from "@/components/LoginChoiceModal";
+import {CompetitorLoginModal} from "@/UserLoginModal";
+import {HostLoginModal} from "@/components/HostLoginModal";
 
 
 const NavigationMenu = () => {
@@ -18,6 +21,9 @@ const NavigationMenu = () => {
     const [showCompetitorRegistration, setShowCompetitorRegistration] = useState(false);
     const [showHostRegistration, setShowHostRegistration] = useState(false);
     const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const [showLoginModal, setShowLoginModal] = useState(false);
+    const [showCompetitorLogin, setShowCompetitorLogin] = useState(false);
+    const [showHostLogin, setShowHostLogin] = useState(false);
 
     // components/NavigationMenu.tsx
     const handleCompetitorRegistration = async (data: { username: string; walletAddress: string }) => {
@@ -65,6 +71,43 @@ const NavigationMenu = () => {
         }
     };
 
+    const handleCompetitorLogin = async (data: { username: string; walletAddress: string }) => {
+        try {
+            await login.competitor(data.username, data.walletAddress);
+            setShowCompetitorLogin(false);
+            toast({
+                title: "Login Successful",
+                description: "Welcome back!",
+                variant: "success",
+            });
+            router.push(`/profile/${data.walletAddress}`);
+        } catch (error) {
+            toast({
+                title: "Login Failed",
+                description: error instanceof Error ? error.message : "Please try again",
+                variant: "destructive",
+            });
+        }
+    };
+
+    const handleHostLogin = async (data: { email: string; organization: string; contactName: string }) => {
+        try {
+            await login.host(data.email, data.organization, data.contactName);
+            setShowHostLogin(false);
+            toast({
+                title: "Login Successful",
+                description: "Welcome back!",
+                variant: "success",
+            });
+            router.push('/host/dashboard');
+        } catch (error) {
+            toast({
+                title: "Login Failed",
+                description: error instanceof Error ? error.message : "Please try again",
+                variant: "destructive",
+            });
+        }
+    };
     return (
         <div className="bg-gray-900 border-b border-gray-800">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -154,6 +197,11 @@ const NavigationMenu = () => {
                     setShowChoiceModal(false);
                     setShowHostRegistration(true);
                 }}
+                onSwitchToLogin={() => {
+                    setShowChoiceModal(false);
+                    setShowLoginModal(true);
+                }}
+
             />
 
             <UserRegistrationModal
@@ -166,6 +214,31 @@ const NavigationMenu = () => {
                 isOpen={showHostRegistration}
                 onClose={() => setShowHostRegistration(false)}
                 onSubmit={handleHostRegistration}
+            />
+
+            <LoginChoiceModal
+                isOpen={showLoginModal}
+                onClose={() => setShowLoginModal(false)}
+                onChooseCompetitor={() => {
+                    setShowLoginModal(false);
+                    setShowCompetitorLogin(true);
+                }}
+                onChooseHost={() => {
+                    setShowLoginModal(false);
+                    setShowHostLogin(true);
+                }}
+            />
+
+            <CompetitorLoginModal
+                isOpen={showCompetitorLogin}
+                onClose={() => setShowCompetitorLogin(false)}
+                onSubmit={handleCompetitorLogin}
+            />
+
+            <HostLoginModal
+                isOpen={showHostLogin}
+                onClose={() => setShowHostLogin(false)}
+                onSubmit={handleHostLogin}
             />
         </div>
     );
