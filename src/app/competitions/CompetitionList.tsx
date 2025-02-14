@@ -4,11 +4,12 @@ import React, {useEffect, useState} from 'react';
 import {Card, CardContent} from "@/components/ui/card";
 import {Badge} from "@/components/ui/badge";
 import {Button} from '@/components/ui/button';
-import {Play, Timer, Trophy, Users, Zap} from 'lucide-react';
+import {Play, Timer, Trophy, Users, Zap, Frown} from 'lucide-react';
 import {useRouter} from 'next/navigation';
 import {api} from '@/services/api';
 import {Competition} from '@/types';
 import {useAuth} from '@/contexts/AuthContext';
+import Link from "next/link";
 
 const CompetitionList = () => {
     const router = useRouter();
@@ -43,6 +44,33 @@ const CompetitionList = () => {
         </div>;
     }
 
+    if (competitions.length === 0) {
+        return (
+            <div className="min-h-screen bg-black text-white">
+                <div className="max-w-7xl mx-auto p-6">
+                    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+                        <div className="bg-gray-900/50 border border-gray-800 rounded-2xl p-8 max-w-lg">
+                            <Frown className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                            <h2 className="text-2xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-cyan-400">
+                                No Competitions Yet
+                            </h2>
+                            <p className="text-gray-400 mb-6">
+                                There are no active competitions at the moment. Please check back soon for exciting new challenges!
+                            </p>
+                            <div className="border-t border-gray-800 pt-6">
+                                <p className="text-sm text-gray-500">
+                                    Want to host a competition?
+                                    <Link href="/host" className="text-purple-400 hover:text-purple-300 ml-1">
+                                        Click here to get started
+                                    </Link>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
     if (error) {
         return <div className="text-center text-red-500 p-4">{error}</div>;
     }
